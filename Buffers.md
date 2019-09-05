@@ -112,7 +112,7 @@ SequencePosition? FindIndexOf(in ReadOnlySequence<byte> buffer, byte data) => bu
 
 #### Processing a ReadOnlySequence\<T\> 
 
-Processing a `ReadOnlySequence<T>` can be challenging because data can be split across multiple segments within the sequence. For the best performance split code in to a fast path that deals with the single segment case and a slow path deals with the data split across segments. There are a couple of ways of parsing data in multi-segmented sequences:
+Processing a `ReadOnlySequence<T>` can be challenging because data can be split across multiple segments within the sequence. For the best performance split code in to a fast path that deals with the single segment case and a slow path deals with the data split across segments. There are a couple of ways of processing data in multi-segmented sequences:
 
 - Use the [`SequenceReader<T>`](#sequencereadert)
 - Parse data segment by segment, keeping track of the `SequencePosition` and index within the segment parsed. this will avoid unnecessary allocations but may be inefficient (especially for small buffers).
@@ -121,7 +121,7 @@ Processing a `ReadOnlySequence<T>` can be challenging because data can be split 
   - Copy the `ReadOnlySequence<T>` into a pooled array using `ArrayPool<T>.Shared`.
   - Use `ReadOnlySequence<T>.ToArray()`. This will allocate a new `T[]` on the heap so it's not recommended in hot paths.
 
-The below examples show a couple of commons cases for parsing `ReadOnlySequence<byte>`:
+The below examples show a couple of commons cases for processing `ReadOnlySequence<byte>`:
 
 ##### Processing Binary Data
 
@@ -299,11 +299,11 @@ There are a couple of quirks when dealing with a `ReadOnlySequence<T>/SequencePo
 
 `SequenceReader<T>` is a new type that was introduced in .NET Core 3.0 to simplify the processing of `ReadOnlySequence<T>`. It tries unify the differences between single segment and multi segment `ReadOnlySequence<T>`. It also provides helpers for reading binary and text data (byte and char) that may or may not be split across segments. 
 
-There are a built in methods for dealing with parsing both binary and delimeted data. Lets take a look at what those same methods look like with the `SequenceReader<T>`:
+There are a built in methods for dealing with processing both binary and delimeted data. Lets take a look at what those same methods look like with the `SequenceReader<T>`:
 
 #### Accessing data
 
-`SequenceReader<T>` has methods for enumerating data inside of the `ReadOnlySequence<T>` directly. Below is an example of parsing a `ReadOnlySequence<byte>` a `byte` at a time:
+`SequenceReader<T>` has methods for enumerating data inside of the `ReadOnlySequence<T>` directly. Below is an example of processing a `ReadOnlySequence<byte>` a `byte` at a time:
 
 ```C#
 while (!reader.End)
