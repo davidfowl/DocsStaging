@@ -380,6 +380,6 @@ static bool TryParseLine(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence
 
 ### Gotchas
 
-- `SequenceReader<T>` is a mutable struct, it should always be passed by reference (in/ref).
-- `SequenceReader<T>` is a ref-struct and it can only be used in synchronous methods.
+- `SequenceReader<T>` is a mutable struct, it should always be passed by reference (ref keyword).
+- `SequenceReader<T>` is a ref-struct and it can only be used in synchronous methods and cannot be stored in fields.
 - `SequenceReader<T>` is a forward only reader and `Advance` does not support negative numbers.
