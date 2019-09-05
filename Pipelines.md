@@ -166,4 +166,5 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
 
 ### Using PipeReader with Stream APIs
 
-When reading streaming data it is very common to read data using a de-serializer or write data using a serializer. Most of these APIs take `Stream` today. In order to make it easier to integrate with these existing APIs `PipeReader` and `PipeWriter` expose an `AsStream` which will return a `Stream` implementation around the `PipeReader` or `PipeWriter`.
+When reading streaming data it is very common to read data using a de-serializer or write data using a serializer. Most of these APIs take `Stream` today. In order to make it easier to integrate with these existing APIs `PipeReader` and `PipeWriter` expose an `AsStream` which will return a `Stream` implementation around the `PipeReader` or `PipeWriter`. 
+
