@@ -6,10 +6,11 @@
     - [Cancellation](#)
     - [Scheduling](#)
     - [Backpressure and flow control](#)
-- [Reading from a PipeReader](#)
-- [Scenarios](#)
-- [Gotchas](#)
-- [Using PipeReader with Stream APIs](#)
+- [PipeReader](#)
+    - [Scenarios](#)
+    - [Gotchas](#)
+- [PipeWriter](#)
+- [Stream Interop](#)
 
 System.IO.Pipelines is a new library that is designed to make it easier to do high performance IO in .NET. It’s a library targeting .NET Standard that works on all .NET implementations.
 
@@ -226,7 +227,7 @@ At the end of each of the loops, we complete both the reader and the writer. Thi
 
 ### Backpressure and flow control
 
-## Reading from a [PipeReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipereader?view=dotnet-plat-ext-2.1)
+## [PipeReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipereader?view=dotnet-plat-ext-2.1)
 
 The `PipeReader` manages memory on the callers behalf, because of this it's important to **always** call `PipeReader.AdvanceTo` after calling `PipeReader.ReadAsync`. This lets the `PipeReader` know when the caller is done with the memory so that it can be tracked appropriately. The `ReadOnlySequence<byte>` returned from `PipeReader.ReadAsync` is only valid until the call the `PipeReader.AdvanceTo`. This means that it's illegal to use it after calling `PipeReader.AdvanceTo` and doing so may result in invalid/undocumented/broken behavior. 
 
@@ -467,7 +468,7 @@ while (true)
 }
 ```
 
-### Using PipeReader with Stream APIs
+### Stream Interop
 
 When reading streaming data it is very common to read data using a de-serializer or write data using a serializer. Most of these APIs take `Stream` today. In order to make it easier to integrate with these existing APIs `PipeReader` and `PipeWriter` expose an `AsStream` which will return a `Stream` implementation around the `PipeReader` or `PipeWriter`. 
 
