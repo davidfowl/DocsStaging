@@ -165,9 +165,7 @@ async Task ReadPipeAsync(PipeReader reader)
     while (true)
     {
         ReadResult result = await reader.ReadAsync();
-
         ReadOnlySequence<byte> buffer = result.Buffer;
-        SequencePosition? position = null;
 
         while (TryReadLine(ref buffer, out ReadOnlySequence<byte> line))
         {
@@ -309,23 +307,11 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
             ReadResult result = await reader.ReadAsync(cancellationToken);
             ReadOnlySequence<byte> buffer = result.Buffer;
 
-            // In the event that we don't parse any message successfully, mark consumed as nothing
-            // and examined as the entire buffer.
-            SequencePosition consumed = buffer.Start;
-            SequencePosition examined = buffer.End;
-
             try
             {
+                // Process all messages from the buffer
                 while (TryParseMessage(ref buffer, out Message message))
                 {
-                    // We successfully parsed a single message so mark the start as the parsed buffer as consumed
-                    // TryParseMessage trims the buffer to point to the data after the message was parsed
-                    consumed = buffer.Start;
-
-                    // Examined is marked the same as consumed here so that the next call to ReadSingleMessageAsync
-                    // will process the next message if there is one
-                    examined = consumed;
-
                     await ProcessMessageAsync(message);
                 }
 
@@ -342,7 +328,9 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
             }
             finally
             {
-                reader.AdvanceTo(consumed, examined);
+                // Since we're processing all messages in the buffer, we can use the remaining buffer's Start and End
+                // position to determine consumed and examined
+                reader.AdvanceTo(buffer.Start, buffer.End);
             }
         }
     }
