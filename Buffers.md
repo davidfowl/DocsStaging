@@ -4,11 +4,11 @@
     - [IBufferWriter\<T\>](#ibufferwritert)
 - **Reading**
     - [ReadOnlySequence\<T\>](#readonlysequencet)
-       - [Accessing data](#)
-       - [Gotchas](#)
+       - [Accessing data](#accessing-data)
+       - [Gotchas](#gotchas-1)
     - [SequenceReader\<T\>](#sequencereadert)
-       - [Accessing data](#)
-       - [Gotchas](#)
+       - [Accessing data](#accessing-data-1)
+       - [Gotchas](#gotchas-2)
    
 ## [IBufferWriter\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.ibufferwriter-1?view=netstandard-2.1)
 
