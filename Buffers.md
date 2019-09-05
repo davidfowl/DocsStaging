@@ -234,10 +234,9 @@ static void EmptySegments()
     // This logic creates a ReadOnlySequence<byte> with 4 segments but with a length of 2
     // 2 of those segments are empty
     var first = new BufferSegment(new byte[0]);
-    var last = first;
-    last = last.Append(new byte[] { 97 });
-    last = last.Append(new byte[0]);
-    last = last.Append(new byte[] { 98 });
+    var last = first.Append(new byte[] { 97 }).Append(new byte[0]).Append(new byte[] { 98 });
+    
+    // Construct the ReadOnlySequence<byte> from the linked list segments
     var data = new ReadOnlySequence<byte>(first, 0, last, 1);
 
     // Slice using numbers
