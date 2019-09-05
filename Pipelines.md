@@ -10,7 +10,7 @@
     - [Scenarios](#)
     - [Gotchas](#)
 - [PipeWriter](#)
-- [Stream Interop](#)
+- [Streams](#)
 
 System.IO.Pipelines is a new library that is designed to make it easier to do high performance IO in .NET. It’s a library targeting .NET Standard that works on all .NET implementations.
 
@@ -468,7 +468,9 @@ while (true)
 }
 ```
 
-### Stream Interop
+## [PipeWriter](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipewriter?view=dotnet-plat-ext-2.1)
+
+## Streams
 
 When reading streaming data it is very common to read data using a de-serializer or write data using a serializer. Most of these APIs take `Stream` today. In order to make it easier to integrate with these existing APIs `PipeReader` and `PipeWriter` expose an `AsStream` which will return a `Stream` implementation around the `PipeReader` or `PipeWriter`. 
 
