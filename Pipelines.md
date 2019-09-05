@@ -41,6 +41,7 @@ These are some of the common pitfalls when reading streaming data. To account fo
 - It's possible that the line is bigger than 1KiB (1024 bytes) so we need to resize the input buffer until we have found a new line.
     - If we re-size the buffer it results in more buffer copies as longer lines appear in the input. 
     - To reduce wasted space, we also need to compact the buffer used for reading lines.
+- We may want to use buffer pooling to avoid allocating memory repeatedly.
 
 ```C#
 async Task ProcessLinesAsync(NetworkStream stream)
@@ -97,6 +98,8 @@ async Task ProcessLinesAsync(NetworkStream stream)
 }
 ```
 
+The complexity has gone through the roof (and we haven't even covered all of the cases). High performance networking usually means writing very complex code in order to eke out more performance from the system. The goal of **System.IO.Pipelines** is to make writing this type of code easier.
+
 ## Creating a PipeReader/PipeWriter
 
 There are several ways to create a `PipeReader/PipeWriter`:
@@ -109,6 +112,112 @@ var pipe = new Pipe();
 PipeReader reader = pipe.Reader;
 PipeWriter reader = pipe.Writer;
 ```
+
+```C#
+async Task ProcessLinesAsync(Socket socket)
+{
+    var pipe = new Pipe();
+    Task writing = FillPipeAsync(socket, pipe.Writer);
+    Task reading = ReadPipeAsync(pipe.Reader);
+
+    return Task.WhenAll(reading, writing);
+}
+
+async Task FillPipeAsync(Socket socket, PipeWriter writer)
+{
+    const int minimumBufferSize = 512;
+
+    while (true)
+    {
+        // Allocate at least 512 bytes from the PipeWriter
+        Memory<byte> memory = writer.GetMemory(minimumBufferSize);
+        try 
+        {
+            int bytesRead = await socket.ReceiveAsync(memory, SocketFlags.None);
+            if (bytesRead == 0)
+            {
+                break;
+            }
+            // Tell the PipeWriter how much was read from the Socket
+            writer.Advance(bytesRead);
+        }
+        catch (Exception ex)
+        {
+            LogError(ex);
+            break;
+        }
+
+        // Make the data available to the PipeReader
+        FlushResult result = await writer.FlushAsync();
+
+        if (result.IsCompleted)
+        {
+            break;
+        }
+    }
+
+    // Tell the PipeReader that there's no more data coming
+    writer.Complete();
+}
+
+async Task ReadPipeAsync(PipeReader reader)
+{
+    while (true)
+    {
+        ReadResult result = await reader.ReadAsync();
+
+        ReadOnlySequence<byte> buffer = result.Buffer;
+        SequencePosition? position = null;
+
+        while (TryReadLine(ref buffer, out ReadOnlySequence<byte> line))
+        {
+            // Process the line
+            ProcessLine(line);
+        }
+
+        // Tell the PipeReader how much of the buffer we have consumed
+        reader.AdvanceTo(buffer.Start, buffer.End);
+
+        // Stop reading if there's no more data coming
+        if (result.IsCompleted)
+        {
+            break;
+        }
+    }
+
+    // Mark the PipeReader as complete
+    reader.Complete();
+}
+
+bool TryReadLine(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence<byte> buffer)
+{
+    // Look for a EOL in the buffer
+    SequencePosition? position = buffer.PositionOf((byte)'\n');
+
+    if (position == null)
+    {
+        buffer = default;
+        return false;
+    }
+    
+    // Skip the line + the \n
+    buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
+    return true;
+}
+```
+
+There are 2 loops:
+
+- `FillPipeAsync` reads from the `Socket` and writes into the `PipeWriter`.
+- `ReadPipeAsync` reads from the `PipeReader` and parses incoming lines.
+
+There are no explicit buffers allocated anywhere. All buffer management is delegated to the `PipeReader`/`PipeWriter` implementations. This makes it easier for consuming code to focus solely on the business logic instead of complex buffer management.
+
+In the first loop, `PipeWriter.GetMemory(int)` is called to get some memory from the underlying writer; then we call `PipeWriter.Advance(int)` to tell the `PipeWriter` how much data was written to the buffer. `PipeWriter.FlushAsync()` is called to make the data available to the `PipeReader`.
+
+In the second loop, the `PipeReader` is consuming the buffers written to the`PipeWriter` which ultimately comes from the Socket. When the call to `PipeReader.ReadAsync()` returns, a `ReadResult` is returned which contains 2 important pieces of information, the data that was read in the form of `ReadOnlySequence<byte>` and a boolean `IsCompleted` that indicates if we've reached the end of data (EOF). After finding the end of line (EOL) delimiter and parsing the line, the logic slice the buffer to skip what we've already processed and then we call `PipeReader.AdvanceTo` to tell the `PipeReader` how much data we have consumed and examined.
+
+At the end of each of the loops, we complete both the reader and the writer. This lets the underlying Pipe release all of the memory it allocated.
 
 ## Reading from a [PipeReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipereader?view=dotnet-plat-ext-2.1)
 
