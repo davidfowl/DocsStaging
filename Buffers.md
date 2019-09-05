@@ -224,7 +224,7 @@ static bool TryParseLine(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence
 }
 ```
 
-#### Empty segments
+##### Empty segments
 
 It is valid to store empty segments inside of a `ReadOnlySequence<T>` and it may show up while enumerating segments explicitly:
 
