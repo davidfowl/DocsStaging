@@ -1,12 +1,101 @@
 # System.IO.Pipelines
 
-*Pre-requisite: Read https://devblogs.microsoft.com/dotnet/system-io-pipelines-high-performance-io-in-net/ for details on what Pipes are and why you would want to use them*
-
+- [What problem does it solve?](#)
 - [Creating a PipeReader/PipeWriter](#)
 - [Reading from a PipeReader](#)
 - [Scenarios](#)
 - [Gotchas](#)
 - [Using PipeReader with Stream APIs](#)
+
+System.IO.Pipelines is a new library that is designed to make it easier to do high performance IO in .NET. It’s a library targeting .NET Standard that works on all .NET implementations.
+
+## What problem does it solve?
+Correctly parsing streaming data is dominated by boilerplate code and has many corner cases, leading to complex code that is difficult to maintain.
+Achieving high performance and being correct, while also dealing with this complexity is difficult. Pipelines aims to solve this complexity.
+
+Let's start with a simple problem. We want to write a TCP server that receives line-delimited messages (delimited by n) from a client.
+
+The typical code you would write in .NET before pipelines looks something like this:
+
+```C#
+async Task ProcessLinesAsync(NetworkStream stream)
+{
+    var buffer = new byte[1024];
+    await stream.ReadAsync(buffer, 0, buffer.Length);
+    
+    // Process a single line from the buffer
+    ProcessLine(buffer);
+}
+```
+
+This code might work when testing locally but it's has several errors:
+
+- The entire message (end of line) may not have been received in a single call to ReadAsync.
+- It's ignoring the result of stream.ReadAsync() which returns how much data was actually filled into the buffer.
+- It doesn't handle the case where multiple lines come back in a single ReadAsync call.
+
+These are some of the common pitfalls when reading streaming data. To account for this we need to make a few changes:
+
+- We need to buffer the incoming data until we have found a new line.
+- We need to parse all of the lines returned in the buffer.
+- It's possible that the line is bigger than 1KiB (1024 bytes) so we need to resize the input buffer until we have found a new line.
+    - If we re-size the buffer it results in more buffer copies as longer lines appear in the input. 
+    - To reduce wasted space, we also need to compact the buffer used for reading lines.
+
+```C#
+async Task ProcessLinesAsync(NetworkStream stream)
+{
+    byte[] buffer = ArrayPool<byte>.Shared.Rent(1024);
+    var bytesBuffered = 0;
+    var bytesConsumed = 0;
+
+    while (true)
+    {
+        // Calculate the amount of bytes remaining in the buffer
+        var bytesRemaining = buffer.Length - bytesBuffered;
+
+        if (bytesRemaining == 0)
+        {
+            // Double the buffer size and copy the previously buffered data into the new buffer
+            var newBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length * 2);
+            Buffer.BlockCopy(buffer, 0, newBuffer, 0, buffer.Length);
+            // Return the old buffer to the pool
+            ArrayPool<byte>.Shared.Return(buffer);
+            buffer = newBuffer;
+            bytesRemaining = buffer.Length - bytesBuffered;
+        }
+
+        var bytesRead = await stream.ReadAsync(buffer, bytesBuffered, bytesRemaining);
+        if (bytesRead == 0)
+        {
+            // EOF
+            break;
+        }
+        
+        // Keep track of the amount of buffered bytes
+        bytesBuffered += bytesRead;
+        
+        do
+        {
+            // Look for a EOL in the buffered data
+            linePosition = Array.IndexOf(buffer, (byte)'\n', bytesConsumed, bytesBuffered - bytesConsumed);
+
+            if (linePosition >= 0)
+            {
+                // Calculate the length of the line based on the offset
+                var lineLength = linePosition - bytesConsumed;
+
+                // Process the line
+                ProcessLine(buffer, bytesConsumed, lineLength);
+
+                // Move the bytesConsumed to skip past the line we consumed (including \n)
+                bytesConsumed += lineLength + 1;
+            }
+        }
+        while (linePosition >= 0);
+    }
+}
+```
 
 ## Creating a PipeReader/PipeWriter
 
