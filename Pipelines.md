@@ -1,7 +1,11 @@
 # System.IO.Pipelines
 
 - [What problem does it solve?](#)
-- [Creating a PipeReader/PipeWriter](#)
+- [Pipe](#)
+    - [Basic usage](#)
+    - [Cancellation](#)
+    - [Scheduling](#)
+    - [Backpressure and flow control](#)
 - [Reading from a PipeReader](#)
 - [Scenarios](#)
 - [Gotchas](#)
@@ -100,12 +104,9 @@ async Task ProcessLinesAsync(NetworkStream stream)
 
 The complexity has gone through the roof (and we haven't even covered all of the cases). High performance networking usually means writing very complex code in order to eke out more performance from the system. The goal of **System.IO.Pipelines** is to make writing this type of code easier.
 
-## Creating a PipeReader/PipeWriter
+## Pipe
 
-There are several ways to create a `PipeReader/PipeWriter`:
-- Use the [`Pipe`](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipe?view=dotnet-plat-ext-2.1) class to create a `PipeWriter/PipeReader` pair. All data written into the `PipeWriter` will be available in the `PipeReader`.
-- Use `PipeReader.Create`/`PipeWriter.Create` to create a `PipeReader` or `PipeWriter` from an existing `Stream`.
-- Implement your own. Both `PipeReader` and `PipeWriter` are abstract classes.
+The [`Pipe`](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipe?view=dotnet-plat-ext-2.1) class can be uesd to create a `PipeWriter/PipeReader` pair. All data written into the `PipeWriter` will be available in the `PipeReader`.
 
 ```C#
 var pipe = new Pipe();
@@ -218,6 +219,12 @@ In the first loop, `PipeWriter.GetMemory(int)` is called to get some memory from
 In the second loop, the `PipeReader` is consuming the buffers written to the`PipeWriter` which ultimately comes from the Socket. When the call to `PipeReader.ReadAsync()` returns, a `ReadResult` is returned which contains 2 important pieces of information, the data that was read in the form of `ReadOnlySequence<byte>` and a boolean `IsCompleted` that indicates if we've reached the end of data (EOF). After finding the end of line (EOL) delimiter and parsing the line, the logic slice the buffer to skip what we've already processed and then we call `PipeReader.AdvanceTo` to tell the `PipeReader` how much data we have consumed and examined.
 
 At the end of each of the loops, we complete both the reader and the writer. This lets the underlying Pipe release all of the memory it allocated.
+
+### Cancellation
+
+### Scheduling
+
+### Backpressure and flow control
 
 ## Reading from a [PipeReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipereader?view=dotnet-plat-ext-2.1)
 
