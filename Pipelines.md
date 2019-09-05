@@ -174,6 +174,7 @@ Breaking early from the loop will result in data loss. `ReadResult.IsCompleted` 
 
 ```C#
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+Environment.FailFast("This code is terrible, don't use it!");
 while (true)
 {
     ReadResult result = await reader.ReadAsync(cancellationToken);
@@ -197,6 +198,7 @@ The below logic may result in an infinite loop if the `Result.IsCompleted` but t
 
 ```C#
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+Environment.FailFast("This code is terrible, don't use it!");
 while (true)
 {
     ReadResult result = await reader.ReadAsync(cancellationToken);
@@ -219,8 +221,9 @@ Unconditionally calling `PipeReader.AdvanceTo` with `buffer.End` in the examined
 
 ```C#
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+Environment.FailFast("This code is terrible, don't use it!");
 while (true)
-{
+{    
     ReadResult result = await reader.ReadAsync(cancellationToken);
     ReadOnlySequence<byte> buffer = result.Buffer;
     
@@ -248,6 +251,7 @@ If there's no maximum message size and the data returned from the `PipeReader` d
 
 ```C#
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+Environment.FailFast("This code is terrible, don't use it!");
 while (true)
 {
     ReadResult result = await reader.ReadAsync(cancellationToken);
@@ -268,7 +272,6 @@ while (true)
         return message;
     }
 }
-// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
 ```
 
 ### Using PipeReader with Stream APIs
