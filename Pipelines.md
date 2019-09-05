@@ -158,11 +158,118 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
 ### Gotchas
 
 - Passing the wrong values to consumed/examined may result reading already read data (for e.g. passing a `SequencePosition` that was already processed)
-- Passing buffer.End as examined may result in missing/stalled data or hangs. (for e.g. `PipeReader.AdvanceTo(position, buffer.End)` when processing a single message at a time from the buffer.)
+- Passing `buffer.End` as examined may result in missing/stalled data or hangs. (for e.g. `PipeReader.AdvanceTo(position, buffer.End)` when processing a single message at a time from the buffer.)
 - Passing the wrong values to consumed/examined may result in an infinite loop. (for e.g. `PipeReader.AdvanceTo(buffer.Start)` if `buffer.Start` hasn't changed will cause the next call to `PipeReader.ReadAsync` to return immediately before new data arrives)
 - Passing the wrong values to consumed/examined may result in inifinite buffering (eventual OOM). (for e.g.  `PipeReader.AdvanceTo(buffer.Start, buffer.End)` unconditionally when processing a single message at a time from the buffer)
 - Failing to call `PipeReader.Complete/CompleteAsync` may result in a memory leak.
-- Incorrect handling of `ReadResult.Buffer.IsEmpty` and `ReadResult.IsCompleted` may cause incorrect parsing of data.
+- Checking `ReadResult.IsCompleted` and exiting the reading logic before processing the buffer will result in data loss. The loop exit condition should be based on `ReadResult.Buffer.IsEmpty` and `ReadResult.IsCompleted`. Doing this in the wrong order could result in an infinite loop.
+
+#### Code samples
+
+These code samples will result in data loss, hangs, potential security issues (depending on where they are used) and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+
+❌ **Data loss**
+
+Breaking early from the loop will result in data loss. `ReadResult.IsCompleted` can be set to true even if the reader hasn't already processed all of the data. This is possible because unprocessed data is buffered by the `PipeReader`.
+
+```C#
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+while (true)
+{
+    ReadResult result = await reader.ReadAsync(cancellationToken);
+    ReadOnlySequence<byte> buffer = result.Buffer;
+    
+    if (result.IsCompleted)
+    {
+        break;
+    }
+    
+    Process(ref buffer, out Message message);
+    
+    reader.AdvanceTo(buffer.Start, buffer.End);
+}
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+```
+
+❌ **Infitnite loop**
+
+The below logic may result in an infinite loop if the `Result.IsCompleted` but there's never a complete message in the buffer. 
+
+```C#
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+while (true)
+{
+    ReadResult result = await reader.ReadAsync(cancellationToken);
+    ReadOnlySequence<byte> buffer = result.Buffer;
+    if (result.IsCompleted && buffer.IsEmpty)
+    {
+        break;
+    }
+    
+    Process(ref buffer, out Message message);
+    
+    reader.AdvanceTo(buffer.Start, buffer.End);
+}
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+```
+
+❌ **Unexpected Hang**
+
+Unconditionally calling `PipeReader.AdvanceTo` with `buffer.End` in the examined position may result in hangs when parsing a single message. The next call to `PipeReader.AdvanceTo` will not return until there's more data than previous examined.
+
+```C#
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+while (true)
+{
+    ReadResult result = await reader.ReadAsync(cancellationToken);
+    ReadOnlySequence<byte> buffer = result.Buffer;
+    
+    Process(ref buffer, out Message message);
+    
+    if (result.IsCompleted)
+    {
+        break;
+    }
+    
+    // DO NOT COPY THIS CODE
+    reader.AdvanceTo(buffer.Start, buffer.End);
+    
+    if (message != null)
+    {
+        return message;
+    }
+}
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+```
+
+❌ **Out of Memory**
+
+If there's no maximum message size and the data returned from the `PipeReader` does not make a complete message (because the other side is writing a large message e.g 4GB) the logic below will keep buffering until an `OutOfMemoryException` occurs.
+
+```C#
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+while (true)
+{
+    ReadResult result = await reader.ReadAsync(cancellationToken);
+    ReadOnlySequence<byte> buffer = result.Buffer;
+    
+    Process(ref buffer, out Message message);
+    
+    if (result.IsCompleted)
+    {
+        break;
+    }
+    
+    // DO NOT COPY THIS CODE
+    reader.AdvanceTo(buffer.Start, buffer.End);
+    
+    if (message != null)
+    {
+        return message;
+    }
+}
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+```
 
 ### Using PipeReader with Stream APIs
 
