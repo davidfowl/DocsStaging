@@ -31,7 +31,7 @@ The above method requests at least 5 bytes from the `IBufferWriter<byte>` using 
 
 ### Gotchas
 
-## [ReadOnlySequence\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.readonlysequence-1)
+- [ReadOnlySequence\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.readonlysequence-1)
 - `GetSpan`/`GetMemory` returns a buffer with at least the requested amount of memory. Don't assume exact buffer sizes.
 
 ![image](https://user-images.githubusercontent.com/95136/64049773-cbd04600-cb2a-11e9-9d37-404488a2d6d5.png)
