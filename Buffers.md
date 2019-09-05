@@ -241,18 +241,18 @@ static void EmptySegments()
     var data = new ReadOnlySequence<byte>(first, 0, last, 1);
 
     // Slice using numbers
-    var seq1 = data.Slice(0, 2);
+    var sequence1 = data.Slice(0, 2);
     
-    // Slice using SequencePosition
-    var seq2 = data.Slice(data.Start, 2);
+    // Slice using SequencePosition pointing at the empty segment
+    var sequence2 = data.Slice(data.Start, 2);
 
-    Console.WriteLine($"seq1.Length={seq1.Length}"); // seq1.Length=2
-    Console.WriteLine($"seq2.Length={seq2.Length}"); // seq2.Length=2
+    Console.WriteLine($"sequence1.Length={sequence1.Length}"); // sequence1.Length=2
+    Console.WriteLine($"sequence2.Length={sequence2.Length}"); // sequence2.Length=2
 
-    Console.WriteLine($"seq1.FirstSpan.Length={seq1.FirstSpan.Length}"); // seq1.FirstSpan.Length=1
+    Console.WriteLine($"sequence1.FirstSpan.Length={sequence1.FirstSpan.Length}"); // sequence1.FirstSpan.Length=1
     
     // Slicing using SequencePosition will Slice the ReadOnlySequence<byte> directly on the empty segment!
-    Console.WriteLine($"seq2.FirstSpan.Length={seq2.FirstSpan.Length}"); // seq2.FirstSpan.Length=0
+    Console.WriteLine($"sequence2.FirstSpan.Length={sequence2.FirstSpan.Length}"); // sequence2.FirstSpan.Length=0
 
     // This prints 0, 1, 0, 1
     SequencePosition position = data.Start;
