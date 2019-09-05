@@ -113,6 +113,8 @@ PipeReader reader = pipe.Reader;
 PipeWriter reader = pipe.Writer;
 ```
 
+### Basic usage
+
 ```C#
 async Task ProcessLinesAsync(Socket socket)
 {
