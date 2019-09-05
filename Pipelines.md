@@ -4,7 +4,7 @@
 
 - [Creating a PipeReader/PipeWriter](#)
 - [Reading from a PipeReader](#)
-- [Use cases](#)
+- [Scenarios](#)
 - [Gotchas](#)
 - [Using PipeReader with Stream APIs](#)
 
@@ -27,7 +27,7 @@ The `PipeReader` manages memory on the callers behalf, because of this it's impo
 
 `PipeReader.AdvanceTo` takes 2 `SequencePosition(s)`, the first one determines how much memory was consumed and the second determines how much of the buffer was observed. Marking data as consumed means the pipe can clean the memory up (return it to the underlying buffer pool etc), while marking data as observed controls what the next call to `PipeReader.ReadAsync` will do. Marking everything observed means the next call to `PipeReader.ReadAsync` will not return until there's more data. Anything other value will make the next call to `PipeReader.ReadAsync` return immediately with the unobserved data.
 
-### Use cases
+### Scenarios
 
 There are a couple of typical patterns that emerge when trying to read streaming data:
 - Given a stream of data, parse a single message
