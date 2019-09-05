@@ -234,7 +234,6 @@ while (true)
         break;
     }
     
-    // DO NOT COPY THIS CODE
     reader.AdvanceTo(buffer.Start, buffer.End);
     
     if (message != null)
@@ -264,7 +263,6 @@ while (true)
         break;
     }
     
-    // DO NOT COPY THIS CODE
     reader.AdvanceTo(buffer.Start, buffer.End);
     
     if (message != null)
