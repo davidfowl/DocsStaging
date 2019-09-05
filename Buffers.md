@@ -224,6 +224,68 @@ static bool TryParseLine(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence
 }
 ```
 
+#### Empty segments
+
+It is valid to store empty segments inside of a `ReadOnlySequence<T>` and it may show up while enumerating segments explicitly:
+
+```C#
+static void EmptySegments()
+{
+    // This logic creates a ReadOnlySequence<byte> with 4 segments but with a length of 2
+    // 2 of those segments are empty
+    var first = new BufferSegment(new byte[0]);
+    var last = first;
+    last = last.Append(new byte[] { 97 });
+    last = last.Append(new byte[0]);
+    last = last.Append(new byte[] { 98 });
+    var data = new ReadOnlySequence<byte>(first, 0, last, 1);
+
+    // Slice using numbers
+    var seq1 = data.Slice(0, 2);
+    
+    // Slice using SequencePosition
+    var seq2 = data.Slice(data.Start, 2);
+
+    Console.WriteLine($"seq1.Length={seq1.Length}"); // seq1.Length=2
+    Console.WriteLine($"seq2.Length={seq2.Length}"); // seq2.Length=2
+
+    Console.WriteLine($"seq1.FirstSpan.Length={seq1.FirstSpan.Length}"); // seq1.FirstSpan.Length=1
+    
+    // Slicing using SequencePosition will Slice the ReadOnlySequence<byte> directly on the empty segment!
+    Console.WriteLine($"seq2.FirstSpan.Length={seq2.FirstSpan.Length}"); // seq2.FirstSpan.Length=0
+
+    // This prints 0, 1, 0, 1
+    SequencePosition position = data.Start;
+    while (data.TryGet(ref position, out ReadOnlyMemory<byte> memory))
+    {
+        Console.WriteLine(memory.Length);
+    }
+}
+
+class BufferSegment : ReadOnlySequenceSegment<byte>
+{
+    public BufferSegment(Memory<byte> memory)
+    {
+        Memory = memory;
+    }
+
+    public BufferSegment Append(Memory<byte> memory)
+    {
+        var segment = new BufferSegment(memory)
+        {
+            RunningIndex = RunningIndex + Memory.Length
+        };
+        Next = segment;
+        return segment;
+    }
+}
+```
+
+The above logic creates a `ReadOnlySequence<byte>` with empty segments and shows how those empty segments affect the various APIs:
+- `ReadOnlySequence<T>.Slice` with a `SequencePosition` pointing to an empty segment will preserve that segment.
+- `ReadOnlySequence<T>.Slice` with an int will skip over the empty segments slicing.
+- Enumerating the `ReadOnlySequence<T>` will enumerate the empty segments as well.
+
 ### Gotchas
 
 There are a couple of quirks when dealing with a `ReadOnlySequence<T>/SequencePosition` vs a normal `ReadOnlySpan<T>/ReadOnlyMemory<T>/T[]/int`:
@@ -232,6 +294,7 @@ There are a couple of quirks when dealing with a `ReadOnlySequence<T>/SequencePo
 - `GetPosition(long)` does **not** support negative indexes. This means it's impossible to get the second last character without walking all segments.
 - `SequencePosition`(s) cannot be compared. This makes it hard to know if one position is greater than or less than another position and makes it hard to write some parsing algorithms.
 - `ReadOnlySequence<T>` is bigger than an object reference and should be passed by in or ref where possible. This reduces copies of the struct.
+- Empty segments are valid within a `ReadOnlySequence<T>` and can appear when iterating using `ReadOnlySequence<T>.TryGet` or slicing the sequence using `ReadOnlySequence<T>.Slice()` with `SequencePosition`(s).
 
 ## [SequenceReader\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.sequencereader-1?view=netcore-3.0)
 
