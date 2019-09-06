@@ -32,6 +32,8 @@ The above method requests at least 5 bytes from the `IBufferWriter<byte>` using 
 ### Gotchas
 
 - `GetSpan`/`GetMemory` returns a buffer with at least the requested amount of memory. Don't assume exact buffer sizes.
+- There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
+- You must request a new buffer after calling `Advance` to continue writing more data; you cannot write to a previously acquired buffer.
 
 ## [ReadOnlySequence\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.readonlysequence-1)
 
