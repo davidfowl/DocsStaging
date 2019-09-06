@@ -3,11 +3,11 @@
 - [What problem does it solve?](#)
 - [Pipe](#)
     - [Basic usage](#)
-    - [Cancellation](#)
     - [Scheduling](#)
     - [Backpressure and flow control](#)
 - [PipeReader](#)
     - [Scenarios](#)
+    - [Cancellation](#)
     - [Gotchas](#)
 - [PipeWriter](#)
     - [Scenarios](#)
@@ -223,8 +223,6 @@ In the second loop, the `PipeReader` is consuming the buffers written to the`Pip
 
 At the end of each of the loops, we complete both the reader and the writer. This lets the underlying Pipe release all of the memory it allocated.
 
-### Cancellation
-
 ### Scheduling
 
 ### Backpressure and flow control
@@ -352,6 +350,8 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
     }
 }
 ```
+
+### Cancellation
 
 ### Gotchas
 
