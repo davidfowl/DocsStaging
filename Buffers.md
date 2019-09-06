@@ -2,6 +2,7 @@
 
 - **Writing**
     - [IBufferWriter\<T\>](#ibufferwritert)
+       - [Gotchas](#gotchas)
 - **Reading**
     - [ReadOnlySequence\<T\>](#readonlysequencet)
        - [Accessing data](#accessing-data)
