@@ -359,6 +359,7 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
 - Passing `buffer.End` as examined may result in missing/stalled data or hangs. (for e.g. `PipeReader.AdvanceTo(position, buffer.End)` when processing a single message at a time from the buffer.)
 - Passing the wrong values to consumed/examined may result in an infinite loop. (for e.g. `PipeReader.AdvanceTo(buffer.Start)` if `buffer.Start` hasn't changed will cause the next call to `PipeReader.ReadAsync` to return immediately before new data arrives)
 - Passing the wrong values to consumed/examined may result in inifinite buffering (eventual OOM). (for e.g.  `PipeReader.AdvanceTo(buffer.Start, buffer.End)` unconditionally when processing a single message at a time from the buffer)
+- Using the `ReadOnlySequence<byte>` after calling `PipeReader.AdvanceTo` may result in memory corruption.
 - Failing to call `PipeReader.Complete/CompleteAsync` may result in a memory leak.
 - Checking `ReadResult.IsCompleted` and exiting the reading logic before processing the buffer will result in data loss. The loop exit condition should be based on `ReadResult.Buffer.IsEmpty` and `ReadResult.IsCompleted`. Doing this in the wrong order could result in an infinite loop.
 
