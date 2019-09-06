@@ -232,6 +232,8 @@ In a perfect world, reading & parsing work as a team: the writing thread consume
 
 To solve this problem, the `Pipe` has two settings to control the flow of data, the `PauseWriterThreshold` and the `ResumeWriterThreshold`. The `PauseWriterThreshold` determines how much data should be buffered before calls to PipeWriter.FlushAsync pauses. The `ResumeWriterThreshold` controls how much the reader has to consume before writing can resume.
 
+![image](https://user-images.githubusercontent.com/95136/64408565-ee3af580-d03b-11e9-9e8a-5b9bc56d592b.png)
+
 ### Scheduling
 
 ## [PipeReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipereader?view=dotnet-plat-ext-2.1)
