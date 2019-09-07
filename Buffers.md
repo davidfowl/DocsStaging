@@ -38,7 +38,7 @@ void WriteHello(IBufferWriter<byte> writer)
 {
     byte[] helloBytes = Encoding.ASCII.GetBytes("Hello");
     
-    // Copy these bytes into 
+    // Write helloBytes to the writer, there's no need to call Advance here (Write does that)
     writer.Write(helloBytes);
 }
 ```
