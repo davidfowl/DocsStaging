@@ -13,7 +13,7 @@
 - [PipeWriter](#pipewriter)
     - [Scenarios](#)
     - [Gotchas](#)
-- [Streams](#)
+- [Streams](#streams)
 
 System.IO.Pipelines is a new library that is designed to make it easier to do high performance IO in .NET. It’s a library targeting .NET Standard that works on all .NET implementations.
 
