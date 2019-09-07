@@ -3,6 +3,7 @@
 - **Writing**
     - [IBufferWriter\<T\>](#ibufferwritert)
        - [Gotchas](#gotchas)
+    - [ArrayBufferWriter\<T\>](#)
 - **Reading**
     - [ReadOnlySequence\<T\>](#readonlysequencet)
        - [Accessing data](#accessing-data)
