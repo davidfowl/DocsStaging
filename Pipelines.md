@@ -3,7 +3,6 @@
 - [What problem does it solve?](#what-problem-does-it-solve)
 - [Pipe](#pipe)
     - [Basic usage](#basic-usage)
-    - [PipeOptions](#pipeoptions)
     - [Backpressure and flow control](#backpressure-and-flow-control)
     - [Scheduling](#scheduling)
 - [PipeReader](#pipereader)
@@ -224,8 +223,6 @@ In the second loop, the `PipeReader` is consuming the buffers written to the`Pip
 
 At the end of each of the loops, we complete both the reader and the writer. This lets the underlying Pipe release all of the memory it allocated.
 
-### PipeOptions
-
 ### Backpressure and flow control
 
 In a perfect world, reading & parsing work as a team: the writing thread consumes the data from the network and puts it in buffers while the parsing thread is responsible for constructing the appropriate data structures. Normally, parsing will take more time than just copying blocks of data from the network. As a result, the reading thread can easily overwhelm the parsing thread. The result is that the reading thread will have to either slow down or allocate more memory to store the data for the parsing thread. For optimal performance, there is a balance between frequent pauses and allocating more memory.
@@ -386,16 +383,16 @@ Environment.FailFast("This code is terrible, don't use it!");
 while (true)
 {
     ReadResult result = await reader.ReadAsync(cancellationToken);
-    ReadOnlySequence<byte> buffer = result.Buffer;
+    ReadOnlySequence<byte> dataLossBuffer = result.Buffer;
     
     if (result.IsCompleted)
     {
         break;
     }
     
-    Process(ref buffer, out Message message);
+    Process(ref dataLossBuffer, out Message message);
     
-    reader.AdvanceTo(buffer.Start, buffer.End);
+    reader.AdvanceTo(dataLossBuffer.Start, dataLossBuffer.End);
 }
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
 ```
@@ -410,15 +407,15 @@ Environment.FailFast("This code is terrible, don't use it!");
 while (true)
 {
     ReadResult result = await reader.ReadAsync(cancellationToken);
-    ReadOnlySequence<byte> buffer = result.Buffer;
-    if (result.IsCompleted && buffer.IsEmpty)
+    ReadOnlySequence<byte> infiniteLoopBuffer = result.Buffer;
+    if (result.IsCompleted && infiniteLoopBuffer.IsEmpty)
     {
         break;
     }
     
-    Process(ref buffer, out Message message);
+    Process(ref infiniteLoopBuffer, out Message message);
     
-    reader.AdvanceTo(buffer.Start, buffer.End);
+    reader.AdvanceTo(infiniteLoopBuffer.Start, infiniteLoopBuffer.End);
 }
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
 ```
@@ -433,16 +430,16 @@ Environment.FailFast("This code is terrible, don't use it!");
 while (true)
 {    
     ReadResult result = await reader.ReadAsync(cancellationToken);
-    ReadOnlySequence<byte> buffer = result.Buffer;
+    ReadOnlySequence<byte> hangBuffer = result.Buffer;
     
-    Process(ref buffer, out Message message);
+    Process(ref hangBuffer, out Message message);
     
     if (result.IsCompleted)
     {
         break;
     }
     
-    reader.AdvanceTo(buffer.Start, buffer.End);
+    reader.AdvanceTo(hangBuffer.Start, hangBuffer.End);
     
     if (message != null)
     {
@@ -462,16 +459,16 @@ Environment.FailFast("This code is terrible, don't use it!");
 while (true)
 {
     ReadResult result = await reader.ReadAsync(cancellationToken);
-    ReadOnlySequence<byte> buffer = result.Buffer;
+    ReadOnlySequence<byte> thisWillOOM = result.Buffer;
     
-    Process(ref buffer, out Message message);
+    Process(ref thisWillOOM, out Message message);
     
     if (result.IsCompleted)
     {
         break;
     }
     
-    reader.AdvanceTo(buffer.Start, buffer.End);
+    reader.AdvanceTo(thisWillOOM.Start, thisWillOOM.End);
     
     if (message != null)
     {
