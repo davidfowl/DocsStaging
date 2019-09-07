@@ -21,7 +21,7 @@ void WriteHello(IBufferWriter<byte> writer)
 {
     // Request at least 5 bytes
     Span<byte> span = writer.GetSpan(5);
-    Span<char> helloSpan = "Hello".AsSpan();
+    ReadOnlySpan<char> helloSpan = "Hello".AsSpan();
     int written = Encoding.ASCII.GetBytes(helloSpan, span);
     
     // Tell the writer how many bytes we wrote
