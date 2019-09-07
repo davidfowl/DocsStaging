@@ -29,7 +29,17 @@ void WriteHello(IBufferWriter<byte> writer)
 }
 ```
 
-The above method requests at least 5 bytes from the `IBufferWriter<byte>` using `GetSpan(5)` then writes the ASCII string "Hello" the `Span<byte>` returned. It then calls `Advance(written)` to indicate how many bytes were written.
+The above method requests at least 5 bytes from the `IBufferWriter<byte>` using `GetSpan(5)` then writes the ASCII string "Hello" the `Span<byte>` returned. It then calls `Advance(written)` to indicate how many bytes were written. This method of writing will use the buffers provided by the `IBufferWriter<T>` but you can also use the [`Write`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.write?view=netstandard-2.1) extension method to copy an existing buffer to the `IBufferWriter<T>`. This will do the work of calling `GetSpan`/`Advance` as appropriate so there's no need to call `Advance` after writing.
+
+```C#
+void WriteHello(IBufferWriter<byte> writer)
+{
+    byte[] helloBytes = Encoding.ASCII.GetBytes("Hello");
+    
+    // Copy these bytes into 
+    writer.Write(helloBytes);
+}
+```
 
 ### Gotchas
 
