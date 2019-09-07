@@ -231,6 +231,8 @@ To solve this problem, the `Pipe` has two settings to control the flow of data, 
 
 ![image](https://user-images.githubusercontent.com/95136/64408565-ee3af580-d03b-11e9-9e8a-5b9bc56d592b.png)
 
+`PipeWriter.FlushAsync` returns an incomplete `ValueTask<FlushResult>` when the amount of data in the Pipe crosses PauseWriterThreshold and completes said task when it becomes lower than ResumeWriterThreshold. Two values are used to prevent thrashing around the limit.
+
 ### Scheduling
 
 ## [PipeReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipereader?view=dotnet-plat-ext-2.1)
