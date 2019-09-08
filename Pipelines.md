@@ -227,11 +227,19 @@ At the end of each of the loops, we complete both the reader and the writer. Thi
 
 In a perfect world, reading & parsing work as a team: the writing thread consumes the data from the network and puts it in buffers while the parsing thread is responsible for constructing the appropriate data structures. Normally, parsing will take more time than just copying blocks of data from the network. As a result, the reading thread can easily overwhelm the parsing thread. The result is that the reading thread will have to either slow down or allocate more memory to store the data for the parsing thread. For optimal performance, there is a balance between frequent pauses and allocating more memory.
 
-To solve this problem, the `Pipe` has two settings to control the flow of data, the `PauseWriterThreshold` and the `ResumeWriterThreshold`. The `PauseWriterThreshold` determines how much data should be buffered before calls to PipeWriter.FlushAsync pauses. The `ResumeWriterThreshold` controls how much the reader has to consume before writing can resume.
+To solve this problem, the `Pipe` has two settings to control the flow of data, the `PauseWriterThreshold` and the `ResumeWriterThreshold`. The `PauseWriterThreshold` determines how much data should be buffered before calls to PipeWriter.FlushAsync pauses. The `ResumeWriterThreshold` controls how much the reader has to observe before writing can resume.
 
 ![image](https://user-images.githubusercontent.com/95136/64408565-ee3af580-d03b-11e9-9e8a-5b9bc56d592b.png)
 
-`PipeWriter.FlushAsync` returns an incomplete `ValueTask<FlushResult>` when the amount of data in the Pipe crosses PauseWriterThreshold and completes said task when it becomes lower than ResumeWriterThreshold. Two values are used to prevent thrashing around the limit.
+`PipeWriter.FlushAsync` returns an incomplete `ValueTask<FlushResult>` when the amount of data in the `Pipe` crosses `PauseWriterThreshold` and completes said ValueTask when it becomes lower than `ResumeWriterThreshold`. Two values are used to prevent thrashing around the limit.
+
+#### Examples
+
+```C#
+// The Pipe will start returning incomplete tasks from FlushAsync until the reader examines at least 5 bytes
+var options = new PipeOptions(pauseWriterThreshold: 10, resumeWriterThreshold: 5);
+var pipe = new Pipe(options);
+```
 
 ### PipeScheduler
 
