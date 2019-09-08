@@ -539,7 +539,7 @@ When writing helpers that read the buffer any returned payload should be copied 
 ```C#
 public class Message
 {
-   public ReadOnlySequence<byte> Payload { get; set; }
+   public ReadOnlySequence<byte> CorruptedPayload { get; set; }
 }
 
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
@@ -556,7 +556,7 @@ while (true)
         message = new Message 
         {
             // Slice the payload from the existing buffer
-            Payload = buffer.Slice(0, length);
+            CorruptedPayload = buffer.Slice(0, length);
         };
         
         buffer = buffer.Slice(length);
