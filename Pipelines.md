@@ -475,6 +475,30 @@ while (true)
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
 ```
 
+Here's another piece of code with the same problem. It's checking for a non-empty buffer before checking `ReadResult.IsCompleted`, but since it's in an `else if`, it'll loop forever if there's never a complete message in the buffer.
+
+```C#
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+Environment.FailFast("This code is terrible, don't use it!");
+while (true)
+{
+    ReadResult result = await reader.ReadAsync(cancellationToken);
+    ReadOnlySequence<byte> infiniteLoopBuffer = result.Buffer;
+    
+    if (!infiniteLoopBuffer.IsEmpty)
+    {
+        Process(ref infiniteLoopBuffer, out Message message);
+    }
+    else if (result.IsCompleted)
+    {
+        break;
+    }
+    
+    reader.AdvanceTo(infiniteLoopBuffer.Start, infiniteLoopBuffer.End);
+}
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+```
+
 ❌ **Unexpected Hang**
 
 Unconditionally calling `PipeReader.AdvanceTo` with `buffer.End` in the examined position may result in hangs when parsing a single message. The next call to `PipeReader.AdvanceTo` will not return until there's more data than previous examined.
