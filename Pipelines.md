@@ -412,7 +412,7 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
 - Passing `buffer.End` as examined may result in missing/stalled data or hangs. (for e.g. `PipeReader.AdvanceTo(position, buffer.End)` when processing a single message at a time from the buffer.)
 - Passing the wrong values to consumed/examined may result in an infinite loop. (for e.g. `PipeReader.AdvanceTo(buffer.Start)` if `buffer.Start` hasn't changed will cause the next call to `PipeReader.ReadAsync` to return immediately before new data arrives)
 - Passing the wrong values to consumed/examined may result in inifinite buffering (eventual OOM). (for e.g.  `PipeReader.AdvanceTo(buffer.Start, buffer.End)` unconditionally when processing a single message at a time from the buffer)
-- Using the `ReadOnlySequence<byte>` after calling `PipeReader.AdvanceTo` may result in memory corruption.
+- Using the `ReadOnlySequence<byte>` after calling `PipeReader.AdvanceTo` may result in memory corruption (use after free).
 - Failing to call `PipeReader.Complete/CompleteAsync` may result in a memory leak.
 - Checking `ReadResult.IsCompleted` and exiting the reading logic before processing the buffer will result in data loss. The loop exit condition should be based on `ReadResult.Buffer.IsEmpty` and `ReadResult.IsCompleted`. Doing this in the wrong order could result in an infinite loop.
 
@@ -519,6 +519,51 @@ while (true)
     
     if (message != null)
     {
+        return message;
+    }
+}
+```
+
+❌ **Memory Corruption**
+
+When writing helpers that read the buffer any returned payload should be copied before calling Advance. The example below will return memory that the `Pipe` has discarded and may reuse for the next operation (read/write).
+
+```C#
+public class Message
+{
+   public ReadOnlySequence<byte> Payload { get; set; }
+}
+
+// These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
+Environment.FailFast("This code is terrible, don't use it!");
+while (true)
+{
+    ReadResult result = await reader.ReadAsync(cancellationToken);
+    ReadOnlySequence<byte> buffer = result.Buffer;
+    
+    ReadHeader(ref buffer, out int length);
+    
+    if (length > 0)
+    {
+        message = new Message 
+        {
+            // Slice the payload from the existing buffer
+            Payload = buffer.Slice(0, length);
+        };
+        
+        buffer = buffer.Slice(length);
+    }
+    
+    if (result.IsCompleted)
+    {
+        break;
+    }
+    
+    reader.AdvanceTo(buffer.Start, buffer.End);
+    
+    if (message != null)
+    {
+        // This code is broken since we called reader.AdvanceTo() with a position *after* the buffer we captured
         return message;
     }
 }
