@@ -4,7 +4,7 @@
 - [Pipe](#pipe)
     - [Basic usage](#basic-usage)
     - [Backpressure and flow control](#backpressure-and-flow-control)
-    - [Scheduling](#scheduling)
+    - [PipeScheduler](#pipescheduler)
 - [PipeReader](#pipereader)
     - [Scenarios](#scenarios)
     - [Cancellation](#cancellation)
@@ -233,7 +233,52 @@ To solve this problem, the `Pipe` has two settings to control the flow of data, 
 
 `PipeWriter.FlushAsync` returns an incomplete `ValueTask<FlushResult>` when the amount of data in the Pipe crosses PauseWriterThreshold and completes said task when it becomes lower than ResumeWriterThreshold. Two values are used to prevent thrashing around the limit.
 
-### Scheduling
+### PipeScheduler
+
+Usually when using async/await, asynchronous code resumes on either on a `TaskScheduler` or on the current `SynchronizationContext`.
+
+When doing IO it's very important to have fine-grained control over where that IO is performed so that one can take advantage of CPU caches more effectively, which is critical for high-performance applications like web servers. The `PipeScheduler` gives users control over where asynchronous callbacks run. By default, the current `SynchronizationContext` will be respected and if there is none, it will use the thread pool to run callbacks.
+
+#### Examples
+
+```C#
+
+public static void Main(string[] args)
+{
+    var writeScheduler = new SingleThreadPipeScheduler();
+    var readScheduler = new SingleThreadPipeScheduler();
+
+    // Tell the Pipe what schedulers to use, we also disable the SynchronizationContext 
+    var options = new PipeOptions(readerScheduler: readScheduler, writerScheduler: writeScheduler, useSynchronizationContext: false);
+    var pipe = new Pipe(options);
+}
+
+// This is a sample scheduler that async callbacks on a single dedicated thread
+public class SingleThreadPipeScheduler : PipeScheduler
+{
+    private readonly BlockingCollection<(Action<object> Action, object State)> _queue = new BlockingCollection<(Action<object> Action, object State)>();
+    private readonly Thread _thread;
+
+    public SingleThreadPipeScheduler()
+    {
+        _thread = new Thread(DoWork);
+        _thread.Start();
+    }
+
+    private void DoWork()
+    {
+        foreach (var item in _queue.GetConsumingEnumerable())
+        {
+            item.Action(item.State);
+        }
+    }
+
+    public override void Schedule(Action<object> action, object state)
+    {
+        _queue.Add((action, state));
+    }
+}
+```
 
 ## [PipeReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipereader?view=dotnet-plat-ext-2.1)
 
