@@ -603,6 +603,42 @@ while (true)
 
 ## [PipeWriter](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipewriter?view=dotnet-plat-ext-2.1)
 
+`PipeWriter` is a new type for buffered writing. It implements `IBufferWriter<T>` which is a simple interface that provides access to a `Memory<T>` or `Span<T>`, write to and say how many of those bytes were written.
+
+```C#
+void WriteHello(PipeWriter writer)
+{
+    // Request at least 5 bytes
+    Span<byte> span = writer.GetSpan(5);
+    ReadOnlySpan<char> helloSpan = "Hello".AsSpan();
+    int written = Encoding.ASCII.GetBytes(helloSpan, span);
+    
+    // Tell the writer how many bytes we wrote
+    writer.Advance(written);
+}
+```
+
+The above method requests at least 5 bytes from the `PipeWriter` using `GetSpan(5)` then writes the ASCII string "Hello" the `Span<byte>` returned. It then calls `Advance(written)` to indicate how many bytes were written. 
+
+This method of writing will use the buffers provided by the `IBufferWriter<T>` but you can also use the [`Write`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.write?view=netstandard-2.1) extension method to copy an existing buffer to the `PipeWriter`. This will do the work of calling `GetSpan`/`Advance` as appropriate so there's no need to call `Advance` after writing.
+
+```C#
+async Task WriteHelloAsync(PipeWriter writer)
+{
+    byte[] helloBytes = Encoding.ASCII.GetBytes("Hello");
+    
+    // Write helloBytes to the writer, there's no need to call Advance here (Write does that)
+    await writer.WriteAsync(helloBytes);
+}
+```
+
+### Gotchas
+
+- `GetSpan`/`GetMemory` returns a buffer with at least the requested amount of memory. Don't assume exact buffer sizes.
+- There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
+- You must request a new buffer after calling `Advance` to continue writing more data; you cannot write to a previously acquired buffer.
+- Calling `Complete/CompleteAsync` while there's unflushed data can result in memory corruption.
+
 ## Streams
 
 When reading streaming data it is very common to read data using a de-serializer or write data using a serializer. Most of these APIs take `Stream` today. In order to make it easier to integrate with these existing APIs `PipeReader` and `PipeWriter` expose an `AsStream` which will return a `Stream` implementation around the `PipeReader` or `PipeWriter`. 
