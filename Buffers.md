@@ -14,7 +14,7 @@
    
 ## [IBufferWriter\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.ibufferwriter-1?view=netstandard-2.1)
 
-`IBufferWriter<T>` is a new type for synchronous memory managed buffered writing. At the lowest level the interface is extremely simple and allows you to get access to a `Memory<T>` or `Span<T>`, write to it and say how many of those bytes were written.
+`IBufferWriter<T>` is a new type for synchronous buffered writing. At the lowest level the interface is extremely simple and allows you to get access to a `Memory<T>` or `Span<T>`, write to it and say how many of those bytes were written.
 
 ```C#
 void WriteHello(IBufferWriter<byte> writer)
