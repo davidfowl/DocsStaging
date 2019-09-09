@@ -313,7 +313,7 @@ There are a couple of quirks when dealing with a `ReadOnlySequence<T>/SequencePo
 
 ## [SequenceReader\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.sequencereader-1?view=netcore-3.0)
 
-`SequenceReader<T>` is a new type that was introduced in .NET Core 3.0 to simplify the processing of `ReadOnlySequence<T>`. It tries unify the differences between single segment and multi segment `ReadOnlySequence<T>`. It also provides helpers for reading binary and text data (byte and char) that may or may not be split across segments. 
+`SequenceReader<T>` is a new type that was introduced in .NET Core 3.0 to simplify the processing of `ReadOnlySequence<T>`. It unifies the differences between single segment and multi segment `ReadOnlySequence<T>`. It also provides helpers for reading binary and text data (byte and char) that may or may not be split across segments. 
 
 There are a built in methods for dealing with processing both binary and delimeted data. Lets take a look at what those same methods look like with the `SequenceReader<T>`:
 
