@@ -606,7 +606,7 @@ while (true)
 `PipeWriter` is a new type for buffered writing. It implements `IBufferWriter<T>` which is a simple interface that provides access to a `Memory<T>` or `Span<T>`, write to and say how many of those bytes were written.
 
 ```C#
-void WriteHello(PipeWriter writer)
+async Task WriteHello(PipeWriter writer)
 {
     // Request at least 5 bytes
     Span<byte> span = writer.GetSpan(5);
@@ -615,10 +615,12 @@ void WriteHello(PipeWriter writer)
     
     // Tell the writer how many bytes we wrote
     writer.Advance(written);
+    
+    await writer.FlushAsync();
 }
 ```
 
-The above method requests at least 5 bytes from the `PipeWriter` using `GetSpan(5)` then writes the ASCII string "Hello" the `Span<byte>` returned. It then calls `Advance(written)` to indicate how many bytes were written. 
+The above method requests at least 5 bytes from the `PipeWriter` using `GetSpan(5)` then writes the ASCII string "Hello" the `Span<byte>` returned. It then calls `Advance(written)` to indicate how many bytes were written. Flushing the `PipeWriter` will push the bytes to the underlying device.
 
 This method of writing will use the buffers provided by the `IBufferWriter<T>` but you can also use the [`Write`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.write?view=netstandard-2.1) extension method to copy an existing buffer to the `PipeWriter`. This will do the work of calling `GetSpan`/`Advance` as appropriate so there's no need to call `Advance` after writing.
 
@@ -638,6 +640,7 @@ async Task WriteHelloAsync(PipeWriter writer)
 - There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
 - You must request a new buffer after calling `Advance` to continue writing more data; you cannot write to a previously acquired buffer.
 - Calling `Complete/CompleteAsync` while there's unflushed data can result in memory corruption.
+- Calling `GetMemory`/`GetSpan` while there's an incomplete call to `FlushAsync` is not safe.
 
 ## Streams
 
