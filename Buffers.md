@@ -14,7 +14,7 @@
    
 ## [IBufferWriter\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.ibufferwriter-1?view=netstandard-2.1)
 
-`IBufferWriter<T>` is a new type for synchronous buffered writing. At the lowest level the interface is extremely simple and allows you to get access to a `Memory<T>` or `Span<T>`, write to it and say how many of those bytes were written.
+`IBufferWriter<T>` is a new type for synchronous buffered writing. At the lowest level the interface is extremely simple and allows you to get access to a `Memory<T>` or `Span<T>`, write to it and say how many `T` items were written.
 
 ```C#
 void WriteHello(IBufferWriter<byte> writer)
@@ -29,9 +29,9 @@ void WriteHello(IBufferWriter<byte> writer)
 }
 ```
 
-The above method requests at least 5 bytes from the `IBufferWriter<byte>` using `GetSpan(5)` then writes the ASCII string "Hello" the `Span<byte>` returned. It then calls `Advance(written)` to indicate how many bytes were written. 
+The preceding method requests a buffer of at least 5 bytes from the `IBufferWriter<byte>` using `GetSpan(5)` then writes bytes for the ASCII string "Hello" to the returned `Span<byte>`. It then calls `Advance(written)` to indicate how many bytes were written to the buffer. 
 
-This method of writing will use the buffers provided by the `IBufferWriter<T>` but you can also use the [`Write`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.write?view=netstandard-2.1) extension method to copy an existing buffer to the `IBufferWriter<T>`. This will do the work of calling `GetSpan`/`Advance` as appropriate so there's no need to call `Advance` after writing.
+This method of writing uses the `Memory<T>`/`Span<T>` buffer provided by the `IBufferWriter<T>`, but you can also use the [`Write`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.write?view=netstandard-2.1) extension method to copy an existing buffer to the `IBufferWriter<T>`. `Write` does the work of calling `GetSpan`/`Advance` as appropriate, so there's no need to call `Advance` after writing.
 
 ```C#
 void WriteHello(IBufferWriter<byte> writer)
@@ -45,7 +45,7 @@ void WriteHello(IBufferWriter<byte> writer)
 
 ### Gotchas
 
-- `GetSpan`/`GetMemory` returns a buffer with at least the requested amount of memory. Don't assume exact buffer sizes.
+- `GetSpan` and `GetMemory` return a buffer with at least the requested amount of memory. Don't assume exact buffer sizes.
 - There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
 - You must request a new buffer after calling `Advance` to continue writing more data; you cannot write to a previously acquired buffer.
 
