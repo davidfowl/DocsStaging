@@ -98,7 +98,7 @@ long FindIndexOf(in ReadOnlySequence<byte> buffer, byte data)
 }
 ```
 
-The above method searches each segment for a specific byte. If we need to keep track of each segment's `SequencePosition` then [`ReadOnlySequence.TryGet`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.readonlysequence-1.tryget?view=netcore-3.0) would be more appropriate. Lets change the above code to return a `SequencePosition` instead of an integer. This has the added benefit of making the caller avoid a second scan to get the data a specific index.
+The above method searches each segment for a specific byte. If we need to keep track of each segment's `SequencePosition` then [`ReadOnlySequence.TryGet`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.readonlysequence-1.tryget?view=netcore-3.0) would be more appropriate. Let's change the above code to return a `SequencePosition` instead of an integer. This has the added benefit of allowing the caller to avoid a second scan to get the data at a specific index.
 
 ```C#
 SequencePosition? FindIndexOf(in ReadOnlySequence<byte> buffer, byte data)
@@ -120,7 +120,7 @@ SequencePosition? FindIndexOf(in ReadOnlySequence<byte> buffer, byte data)
 
 The combination of `SequencePosition` and `TryGet` act like an enumerator. The position field is modified at the start of each iteration to be start of each segment within the `ReadOnlySequence<T>`. 
 
-The above method exists as a extension method on `ReadOnlySequence<T>`. We can use [PositionOf](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.positionof?view=netstandard-2.1) to simplify the above code:
+The preceding method exists as a extension method on `ReadOnlySequence<T>`. We can use [PositionOf](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.positionof?view=netstandard-2.1) to simplify the above code:
 
 ```C#
 SequencePosition? FindIndexOf(in ReadOnlySequence<byte> buffer, byte data) => buffer.PositionOf(data);
@@ -128,16 +128,16 @@ SequencePosition? FindIndexOf(in ReadOnlySequence<byte> buffer, byte data) => bu
 
 #### Processing a ReadOnlySequence\<T\> 
 
-Processing a `ReadOnlySequence<T>` can be challenging because data can be split across multiple segments within the sequence. For the best performance split code in to a fast path that deals with the single segment case and a slow path deals with the data split across segments. There are a couple of ways of processing data in multi-segmented sequences:
+Processing a `ReadOnlySequence<T>` can be challenging since data may be split across multiple segments within the sequence. For the best performance, split code into a fast path, that deals with the single segment case, and a slow path that deals with the data split across segments. There are a few approaches that can be used to process data in multi-segmented sequences:
 
 - Use the [`SequenceReader<T>`](#sequencereadert)
-- Parse data segment by segment, keeping track of the `SequencePosition` and index within the segment parsed. this will avoid unnecessary allocations but may be inefficient (especially for small buffers).
+- Parse data segment by segment, keeping track of the `SequencePosition` and index within the segment parsed. This avoids unnecessary allocations but may be inefficient (especially for small buffers).
 - Copy the `ReadOnlySequence<T>` to a contiguous array and treat it like a single buffer:
-  - If the `ReadOnlySequence<T>` has a length less then 256 it may be reasonable to copy the data into a stack allocated buffers (using the `stackalloc` keyword).
+  - If the `ReadOnlySequence<T>` has a length less then 256, it may be reasonable to copy the data into a stack-allocated buffer (using the `stackalloc` keyword).
   - Copy the `ReadOnlySequence<T>` into a pooled array using `ArrayPool<T>.Shared`.
-  - Use `ReadOnlySequence<T>.ToArray()`. This will allocate a new `T[]` on the heap so it's not recommended in hot paths.
+  - Use `ReadOnlySequence<T>.ToArray()`. This is not recommended in hot paths as it allocates a new `T[]` on the heap.
 
-The below examples show a couple of commons cases for processing `ReadOnlySequence<byte>`:
+The following examples demonstrate some common cases for processing `ReadOnlySequence<byte>`:
 
 ##### Processing Binary Data
 
@@ -178,7 +178,7 @@ bool TryParseHeaderLength(ref ReadOnlySequence<byte> buffer, out int length)
 
 ##### Processing Text Data
 
-This example finds the first newline (`\r\n`) in the `ReadOnlySequence<byte>` and returns it via the out line parameter. It also trims that line (excluding the `\r\n` from the input buffer).
+This example finds the first newline (`\r\n`) in the `ReadOnlySequence<byte>` and returns it via the out 'line' parameter. It also trims that line (excluding the `\r\n` from the input buffer).
 
 ```C#
 static bool TryParseLine(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence<byte> line)
@@ -296,26 +296,26 @@ class BufferSegment : ReadOnlySequenceSegment<byte>
 }
 ```
 
-The above logic creates a `ReadOnlySequence<byte>` with empty segments and shows how those empty segments affect the various APIs:
+The preceding logic creates a `ReadOnlySequence<byte>` with empty segments and shows how those empty segments affect the various APIs:
 - `ReadOnlySequence<T>.Slice` with a `SequencePosition` pointing to an empty segment will preserve that segment.
-- `ReadOnlySequence<T>.Slice` with an int will skip over the empty segments slicing.
+- `ReadOnlySequence<T>.Slice` with an int will skip over the empty segments.
 - Enumerating the `ReadOnlySequence<T>` will enumerate the empty segments as well.
 
 ### Gotchas
 
-There are a couple of quirks when dealing with a `ReadOnlySequence<T>/SequencePosition` vs a normal `ReadOnlySpan<T>/ReadOnlyMemory<T>/T[]/int`:
-- `SequencePosition` is a position marker for a specific `ReadOnlySequence<T>`, not an absolute position. As it is relative to a specfic `ReadOnlySequence<T>`, it doesn't have meaning if used outside of the `ReadOnlySequence<T>` where it originated.
+There are several quirks when dealing with a `ReadOnlySequence<T>`/`SequencePosition` vs. a normal `ReadOnlySpan<T>`/`ReadOnlyMemory<T>`/`T[]`/`int`:
+- `SequencePosition` is a position marker for a specific `ReadOnlySequence<T>`, not an absolute position. As it is relative to a specific `ReadOnlySequence<T>`, it doesn't have meaning if used outside of the `ReadOnlySequence<T>` where it originated.
 - Arithmetic cannot be performed on `SequencePosition` without the `ReadOnlySequence<T>`. This means doing simple things like `position++` looks like `ReadOnlySequence<T>.GetPosition(position, 1)`.
-- `GetPosition(long)` does **not** support negative indexes. This means it's impossible to get the second last character without walking all segments.
+- `GetPosition(long)` does **not** support negative indexes. This means it's impossible to get the second to last character without walking all segments.
 - `SequencePosition`(s) cannot be compared. This makes it hard to know if one position is greater than or less than another position and makes it hard to write some parsing algorithms.
 - `ReadOnlySequence<T>` is bigger than an object reference and should be passed by in or ref where possible. This reduces copies of the struct.
 - Empty segments are valid within a `ReadOnlySequence<T>` and can appear when iterating using `ReadOnlySequence<T>.TryGet` or slicing the sequence using `ReadOnlySequence<T>.Slice()` with `SequencePosition`(s).
 
 ## [SequenceReader\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.sequencereader-1?view=netcore-3.0)
 
-`SequenceReader<T>` is a new type that was introduced in .NET Core 3.0 to simplify the processing of `ReadOnlySequence<T>`. It unifies the differences between single segment and multi segment `ReadOnlySequence<T>`. It also provides helpers for reading binary and text data (byte and char) that may or may not be split across segments. 
+`SequenceReader<T>` is a new type that was introduced in .NET Core 3.0 to simplify the processing of a `ReadOnlySequence<T>`. It unifies the differences between a single segment `ReadOnlySequence<T>` and multi-segment `ReadOnlySequence<T>`. It also provides helpers for reading binary and text data (byte and char) that may or may not be split across segments. 
 
-There are a built in methods for dealing with processing both binary and delimeted data. Lets take a look at what those same methods look like with the `SequenceReader<T>`:
+There are built-in methods for dealing with processing both binary and delimited data. Let's take a look at what those same methods look like with the `SequenceReader<T>`:
 
 #### Accessing data
 
@@ -395,7 +395,6 @@ static bool TryParseLine(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence
 ```
 
 ### Gotchas
-
-- `SequenceReader<T>` is a mutable struct, it should always be passed by reference (ref keyword).
-- `SequenceReader<T>` is a ref-struct and it can only be used in synchronous methods and cannot be stored in fields.
-- `SequenceReader<T>` is a forward only reader and `Advance` does not support negative numbers.
+- `SequenceReader<T>` is a mutable struct; it should always be passed by reference (ref keyword).
+- `SequenceReader<T>` is a ref-struct so it can only be used in synchronous methods and cannot be stored in fields.
+- `SequenceReader<T>` is a forward-only reader, and `Advance` does not support negative numbers.
