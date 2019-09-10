@@ -452,7 +452,7 @@ while (true)
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
 ```
 
-❌ **Infitnite loop**
+❌ **Infinite loop**
 
 The below logic may result in an infinite loop if the `Result.IsCompleted` but there's never a complete message in the buffer. 
 
