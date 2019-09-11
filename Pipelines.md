@@ -381,7 +381,7 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
 
             try
             {
-                // Process all messages from the buffer
+                // Process all messages from the buffer, modifying the input buffer on each iteration
                 while (TryParseMessage(ref buffer, out Message message))
                 {
                     await ProcessMessageAsync(message);
