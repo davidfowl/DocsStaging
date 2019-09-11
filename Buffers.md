@@ -3,7 +3,6 @@
 - **Writing**
     - [IBufferWriter\<T\>](#ibufferwritert)
        - [Gotchas](#gotchas)
-    - [ArrayBufferWriter\<T\>](#arraybufferwritert)
 - **Reading**
     - [ReadOnlySequence\<T\>](#readonlysequencet)
        - [Accessing data](#accessing-data)
@@ -14,7 +13,7 @@
    
 ## [IBufferWriter\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.ibufferwriter-1?view=netstandard-2.1)
 
-`IBufferWriter<T>` is a new type for synchronous buffered writing. At the lowest level the interface is extremely simple and allows you to get access to a `Memory<T>` or `Span<T>`, write to it and say how many `T` items were written.
+`IBufferWriter<T>` is a contract for synchronous buffered writing. At the lowest level the interface is extremely simple and allows you to get access to a `Memory<T>` or `Span<T>`, write to it and say how many `T` items were written.
 
 ```C#
 void WriteHello(IBufferWriter<byte> writer)
@@ -43,15 +42,13 @@ void WriteHello(IBufferWriter<byte> writer)
 }
 ```
 
+[`ArrayBufferWriter<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.arraybufferwriter-1?view=netcore-3.0) is an implementation of `IBufferWriter<T>` whose backing store is a single contiguous array.
+
 ### Gotchas
 
 - `GetSpan` and `GetMemory` return a buffer with at least the requested amount of memory. Don't assume exact buffer sizes.
 - There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
 - You must request a new buffer after calling `Advance` to continue writing more data; you cannot write to a previously acquired buffer.
-
-## [ArrayBufferWriter\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.arraybufferwriter-1?view=netcore-3.0)
-
-TBD
 
 ## [ReadOnlySequence\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.readonlysequence-1)
 
