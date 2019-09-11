@@ -12,6 +12,7 @@
 - [PipeWriter](#pipewriter)
     - [Scenarios](#)
     - [Gotchas](#)
+- [IDuplexPipe](#iduplexpipe)
 - [Streams](#streams)
 
 System.IO.Pipelines is a new library that is designed to make it easier to do high performance IO in .NET. It’s a library targeting .NET Standard that works on all .NET implementations.
@@ -643,6 +644,10 @@ async Task WriteHelloAsync(PipeWriter writer)
 - You must request a new buffer after calling `Advance` to continue writing more data; you cannot write to a previously acquired buffer.
 - Calling `Complete` or `CompleteAsync` while there's unflushed data can result in memory corruption.
 - Calling `GetMemory` or `GetSpan` while there's an incomplete call to `FlushAsync` is not safe.
+
+## IDuplexPipe
+
+TBD
 
 ## Streams
 
