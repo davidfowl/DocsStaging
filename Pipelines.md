@@ -21,7 +21,7 @@ System.IO.Pipelines is a new library that is designed to make it easier to do hi
 Correctly parsing streaming data is dominated by boilerplate code and has many corner cases, leading to complex code that is difficult to maintain.
 Achieving high performance and being correct, while also dealing with this complexity is difficult. Pipelines aims to solve this complexity.
 
-Let's start with a simple problem. We want to write a TCP server that receives line-delimited messages (delimited by n) from a client.
+Let's start with a simple problem. We want to write a TCP server that receives line-delimited messages (delimited by `'\n'`) from a client.
 
 The typical code you would write in .NET before pipelines looks something like this:
 
@@ -36,11 +36,11 @@ async Task ProcessLinesAsync(NetworkStream stream)
 }
 ```
 
-This code might work when testing locally but it's has several errors:
+This code might work when testing locally but it has several errors:
 
 - The entire message (end of line) may not have been received in a single call to ReadAsync.
 - It's ignoring the result of stream.ReadAsync() which returns how much data was actually filled into the buffer.
-- It doesn't handle the case where multiple lines come back in a single ReadAsync call.
+- It doesn't handle the case where multiple lines are read a single ReadAsync call.
 
 These are some of the common pitfalls when reading streaming data. To account for this we need to make a few changes:
 
@@ -220,7 +220,7 @@ There are no explicit buffers allocated anywhere. All buffer management is deleg
 
 In the first loop, `PipeWriter.GetMemory(int)` is called to get some memory from the underlying writer; then we call `PipeWriter.Advance(int)` to tell the `PipeWriter` how much data was written to the buffer. `PipeWriter.FlushAsync()` is called to make the data available to the `PipeReader`.
 
-In the second loop, the `PipeReader` is consuming the buffers written to the`PipeWriter` which ultimately comes from the Socket. The call to `PipeReader.ReadAsync()` returns a `ReadResult` which contains 2 important pieces of information, the data that was read in the form of `ReadOnlySequence<byte>` and a boolean `IsCompleted` that indicates if we've reached the end of data (EOF). After finding the end of line (EOL) delimiter and parsing the line, the logic slice the buffer to skip what we've already processed and then we call `PipeReader.AdvanceTo` to tell the `PipeReader` how much data we have consumed and examined.
+In the second loop, the `PipeReader` is consuming the buffers written to the`PipeWriter` which ultimately comes from the Socket. The call to `PipeReader.ReadAsync()` returns a `ReadResult` which contains 2 important pieces of information, the data that was read in the form of `ReadOnlySequence<byte>` and a boolean `IsCompleted` that indicates if we've reached the end of data (EOF). After finding the end of line (EOL) delimiter and parsing the line, the logic slices the buffer to skip what we've already processed and then we call `PipeReader.AdvanceTo` to tell the `PipeReader` how much data we have consumed and examined.
 
 At the end of each of the loops, we complete both the reader and the writer. This lets the underlying Pipe release all of the memory it allocated.
 
@@ -291,9 +291,9 @@ public class SingleThreadPipeScheduler : PipeScheduler
 
 ## [PipeReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipereader?view=dotnet-plat-ext-2.1)
 
-The `PipeReader` manages memory on the callers behalf, because of this it's important to **always** call `PipeReader.AdvanceTo` after calling `PipeReader.ReadAsync`. This lets the `PipeReader` know when the caller is done with the memory so that it can be tracked appropriately. The `ReadOnlySequence<byte>` returned from `PipeReader.ReadAsync` is only valid until the call the `PipeReader.AdvanceTo`. This means that it's illegal to use it after calling `PipeReader.AdvanceTo` and doing so may result in invalid/undocumented/broken behavior. 
+The `PipeReader` manages memory on the caller's behalf, because of this it's important to **always** call `PipeReader.AdvanceTo` after calling `PipeReader.ReadAsync`. This lets the `PipeReader` know when the caller is done with the memory so that it can be tracked appropriately. The `ReadOnlySequence<byte>` returned from `PipeReader.ReadAsync` is only valid until the call the `PipeReader.AdvanceTo`. This means that it's illegal to use it after calling `PipeReader.AdvanceTo` and doing so may result in invalid/undocumented/broken behavior. 
 
-`PipeReader.AdvanceTo` takes 2 `SequencePosition(s)`, the first one determines how much memory was consumed and the second determines how much of the buffer was observed. Marking data as consumed means the pipe can clean the memory up (return it to the underlying buffer pool etc), while marking data as observed controls what the next call to `PipeReader.ReadAsync` will do. Marking everything observed means the next call to `PipeReader.ReadAsync` will not return until there's more data. Anything other value will make the next call to `PipeReader.ReadAsync` return immediately with the unobserved data.
+`PipeReader.AdvanceTo` takes 2 `SequencePosition`s, the first one determines how much memory was consumed and the second determines how much of the buffer was observed. Marking data as consumed means the pipe can clean the memory up (return it to the underlying buffer pool etc), while marking data as observed controls what the next call to `PipeReader.ReadAsync` will do. Marking everything observed means the next call to `PipeReader.ReadAsync` will not return until there's more data. Any other value will make the next call to `PipeReader.ReadAsync` return immediately with the unobserved data.
 
 ### Scenarios
 
@@ -363,7 +363,7 @@ async ValueTask<Message> ReadSingleMessageAsync(PipeReader reader, CancellationT
 
 The code above parses a single message and updates the consumed and examined `SequencePosition`s to point to start of the trimmed input buffer. This is because `TryParseMessage` removes the parsed message from the input buffer. Generally, when parsing a single message from the buffer, the examined position should be the end of the message or the end of the received buffer if no message was found.
 
-The single message case has the most potential for errors. Passing the wrong values to examined can result in an OOM or infinite loop (see the [gotchas](#) section below).
+The single message case has the most potential for errors. Passing the wrong values to *examined* can result in an OOM or infinite loop (see the [gotchas](#) section below).
 
 #### Reading multiple messages
 
@@ -418,7 +418,7 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
 ### Gotchas
 
 - Passing the wrong values to consumed/examined may result reading already read data (for e.g. passing a `SequencePosition` that was already processed)
-- Passing `buffer.End` as examined may result in missing/stalled data or hangs. (for e.g. `PipeReader.AdvanceTo(position, buffer.End)` when processing a single message at a time from the buffer.)
+- Passing `buffer.End` as examined may result in lost/stalled data or hangs if not all data was examined (for e.g. `PipeReader.AdvanceTo(position, buffer.End)` when processing a single message at a time from the buffer.)
 - Passing the wrong values to consumed/examined may result in an infinite loop. (for e.g. `PipeReader.AdvanceTo(buffer.Start)` if `buffer.Start` hasn't changed will cause the next call to `PipeReader.ReadAsync` to return immediately before new data arrives)
 - Passing the wrong values to consumed/examined may result in inifinite buffering (eventual OOM). (for e.g.  `PipeReader.AdvanceTo(buffer.Start, buffer.End)` unconditionally when processing a single message at a time from the buffer)
 - Using the `ReadOnlySequence<byte>` after calling `PipeReader.AdvanceTo` may result in memory corruption (use after free).
