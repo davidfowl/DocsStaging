@@ -49,6 +49,10 @@ void WriteHello(IBufferWriter<byte> writer)
 - There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
 - You must request a new buffer after calling `Advance` to continue writing more data; you cannot write to a previously acquired buffer.
 
+## [ArrayBufferWriter\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.arraybufferwriter-1?view=netcore-3.0)
+
+TBD
+
 ## [ReadOnlySequence\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.readonlysequence-1)
 
 ![image](https://user-images.githubusercontent.com/95136/64049773-cbd04600-cb2a-11e9-9d37-404488a2d6d5.png)
