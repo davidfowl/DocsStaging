@@ -72,11 +72,11 @@ The 3rd representation is the most interesting one as it has performance implica
 |`ReadOnlySequenceSegment<T>`|`Slice(int, int)`|`O(number of segments)`
 |`ReadOnlySequenceSegment<T>`|`Slice(SequencePostion, SequencePostion)`|`O(1)`
 
-Because of this mixed representation, the `ReadOnlySequence<T>` exposes indexes as `SequencePosition` instead of an integer. A `SequencePosition` is an opaque value that represents an index into the `ReadOnlySequence<T>` where it originated. It consists of 2 parts, a integer and an object, what these 2 values represent are tied to the implementation of `ReadOnlySequence<T>`.
+Because of this mixed representation, the `ReadOnlySequence<T>` exposes indexes as `SequencePosition` instead of an integer. A `SequencePosition` is an opaque value that represents an index into the `ReadOnlySequence<T>` where it originated. It consists of 2 parts, an integer and an object, what these 2 values represent are tied to the implementation of `ReadOnlySequence<T>`.
 
 ### Accessing data
 
-The `ReadOnlySequence<T>` exposes data as a enumerable of `ReadOnlyMemory<T>`. Enumerating each of the segments can be done using a simple foreach:
+The `ReadOnlySequence<T>` exposes data as an enumerable of `ReadOnlyMemory<T>`. Enumerating each of the segments can be done using a simple foreach:
 
 ```C#
 long FindIndexOf(in ReadOnlySequence<byte> buffer, byte data)
@@ -121,7 +121,7 @@ SequencePosition? FindIndexOf(in ReadOnlySequence<byte> buffer, byte data)
 
 The combination of `SequencePosition` and `TryGet` act like an enumerator. The position field is modified at the start of each iteration to be start of each segment within the `ReadOnlySequence<T>`. 
 
-The preceding method exists as a extension method on `ReadOnlySequence<T>`. We can use [PositionOf](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.positionof?view=netstandard-2.1) to simplify the above code:
+The preceding method exists as an extension method on `ReadOnlySequence<T>`. We can use [PositionOf](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.positionof?view=netstandard-2.1) to simplify the above code:
 
 ```C#
 SequencePosition? FindIndexOf(in ReadOnlySequence<byte> buffer, byte data) => buffer.PositionOf(data);
@@ -309,7 +309,7 @@ There are several quirks when dealing with a `ReadOnlySequence<T>`/`SequencePosi
 - Arithmetic cannot be performed on `SequencePosition` without the `ReadOnlySequence<T>`. This means doing simple things like `position++` looks like `ReadOnlySequence<T>.GetPosition(position, 1)`.
 - `GetPosition(long)` does **not** support negative indexes. This means it's impossible to get the second to last character without walking all segments.
 - `SequencePosition`(s) cannot be compared. This makes it hard to know if one position is greater than or less than another position and makes it hard to write some parsing algorithms.
-- `ReadOnlySequence<T>` is bigger than an object reference and should be passed by in or ref where possible. This reduces copies of the struct.
+- `ReadOnlySequence<T>` is bigger than an object reference and should be passed by `in` or `ref` where possible. This reduces copies of the struct.
 - Empty segments are valid within a `ReadOnlySequence<T>` and can appear when iterating using `ReadOnlySequence<T>.TryGet` or slicing the sequence using `ReadOnlySequence<T>.Slice()` with `SequencePosition`(s).
 
 ## [SequenceReader\<T\>](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.sequencereader-1?view=netcore-3.0)
@@ -333,9 +333,9 @@ while (!reader.End)
 
 The `CurrentSpan` exposes the current segment's `Span` (similar to what we do in the method manually).
 
-#### PositionOf
+#### Position
 
-Here's an example of the `PositionOf` implementation using the `SequenceReader<T>`:
+Here's an example implementation of `FindIndexOf` using the `SequenceReader<T>`:
 
 ```C#
 SequencePosition? FindIndexOf(in ReadOnlySequence<byte> buffer, byte data)
