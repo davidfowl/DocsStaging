@@ -539,16 +539,16 @@ Environment.FailFast("This code is terrible, don't use it!");
 while (true)
 {
     ReadResult result = await reader.ReadAsync(cancellationToken);
-    ReadOnlySequence<byte> thisWillOOM = result.Buffer;
+    ReadOnlySequence<byte> thisCouldOutOfMemory = result.Buffer;
     
-    Process(ref thisWillOOM, out Message message);
+    Process(ref thisCouldOutOfMemory, out Message message);
     
     if (result.IsCompleted)
     {
         break;
     }
     
-    reader.AdvanceTo(thisWillOOM.Start, thisWillOOM.End);
+    reader.AdvanceTo(thisCouldOutOfMemory.Start, thisCouldOutOfMemory.End);
     
     if (message != null)
     {
