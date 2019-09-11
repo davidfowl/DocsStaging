@@ -431,7 +431,7 @@ These code samples will result in data loss, hangs, potential security issues (d
 
 ❌ **Data loss**
 
-Breaking early from the loop will result in data loss. `ReadResult.IsCompleted` can be set to true even if the reader hasn't already processed all of the data. This is possible because unprocessed data is buffered by the `PipeReader`.
+The `ReadResult` can return the final segment of data when `IsCompleted` is set to true. Not reading that data before exiting the read loop will result in data loss.
 
 ```C#
 // These code samples will result in data loss, hangs, security issues and should **NOT** be copied. They exists solely for illustration of the gotchas mentioned above.
