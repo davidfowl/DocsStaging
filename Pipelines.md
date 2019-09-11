@@ -603,14 +603,16 @@ while (true)
 
 ## [PipeWriter](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipewriter?view=dotnet-plat-ext-2.1)
 
-`PipeWriter` is a new type for buffered writing. It implements `IBufferWriter<T>` which is a simple interface that provides access to a `Memory<T>` or `Span<T>`, write to and say how many of those bytes were written.
+The `PipeWriter` manages buffers for writing on the caller's behalf. `PipeWriter` implements the [`IBufferWriter<byte>`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.ibufferwriter-1?view=netstandard-2.1) which makes it possible to get access to buffers in order to perform writes without additional buffer copies.
 
 ```C#
 async Task WriteHello(PipeWriter writer)
 {
-    // Request at least 5 bytes
+    // Request at least 5 bytes from the PipeWriter
     Span<byte> span = writer.GetSpan(5);
     ReadOnlySpan<char> helloSpan = "Hello".AsSpan();
+    
+    // Write directly into the buffer
     int written = Encoding.ASCII.GetBytes(helloSpan, span);
     
     // Tell the writer how many bytes we wrote
@@ -622,7 +624,7 @@ async Task WriteHello(PipeWriter writer)
 
 The above method requests at least 5 bytes from the `PipeWriter` using `GetSpan(5)` then writes the ASCII string "Hello" the `Span<byte>` returned. It then calls `Advance(written)` to indicate how many bytes were written. Flushing the `PipeWriter` will push the bytes to the underlying device.
 
-This method of writing will use the buffers provided by the `IBufferWriter<T>` but you can also use the [`Write`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.buffersextensions.write?view=netstandard-2.1) extension method to copy an existing buffer to the `PipeWriter`. This will do the work of calling `GetSpan`/`Advance` as appropriate so there's no need to call `Advance` after writing.
+This method of writing will use the buffers provided by the `PipeWriter` but you can also use [`PipeWriter.WriteAync`](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipewriter.writeasync?view=dotnet-plat-ext-3.0)  method to copy an existing buffer to the `PipeWriter`. This will do the work of calling `GetSpan` and `Advance` as appropriate and will also call `PipeWriter.FlushAsync`.
 
 ```C#
 async Task WriteHelloAsync(PipeWriter writer)
@@ -636,11 +638,11 @@ async Task WriteHelloAsync(PipeWriter writer)
 
 ### Gotchas
 
-- `GetSpan`/`GetMemory` returns a buffer with at least the requested amount of memory. Don't assume exact buffer sizes.
+- `GetSpan` and `GetMemory` return a buffer with at least the requested amount of memory. Don't assume exact buffer sizes.
 - There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
 - You must request a new buffer after calling `Advance` to continue writing more data; you cannot write to a previously acquired buffer.
-- Calling `Complete/CompleteAsync` while there's unflushed data can result in memory corruption.
-- Calling `GetMemory`/`GetSpan` while there's an incomplete call to `FlushAsync` is not safe.
+- Calling `Complete` or `CompleteAsync` while there's unflushed data can result in memory corruption.
+- Calling `GetMemory` or `GetSpan` while there's an incomplete call to `FlushAsync` is not safe.
 
 ## Streams
 
