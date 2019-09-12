@@ -645,7 +645,7 @@ async Task WriteHelloAsync(PipeWriter writer)
 - Calling `GetMemory` or `GetSpan` while there's an incomplete call to `FlushAsync` is not safe.
 - Calling `Complete` or `CompleteAsync` while there's unflushed data can result in memory corruption.
 
-## IDuplexPipe
+## [IDuplexPipe](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.iduplexpipe?view=dotnet-plat-ext-2.1)
 
 The `IDuplexPipe` is a contract for types that support both reading and writing. For example, a network connection would be represented by an `IDuplexPipe`.
 
