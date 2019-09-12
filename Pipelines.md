@@ -11,6 +11,7 @@
     - [Gotchas](#gotchas)
 - [PipeWriter](#pipewriter)
     - [Scenarios](#)
+    - [Cancellation](#cancellation)
     - [Gotchas](#)
 - [IDuplexPipe](#iduplexpipe)
 - [Streams](#streams)
@@ -636,6 +637,8 @@ async Task WriteHelloAsync(PipeWriter writer)
     await writer.WriteAsync(helloBytes);
 }
 ```
+
+### Cancellation
 
 ### Gotchas
 
