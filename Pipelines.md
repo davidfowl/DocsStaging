@@ -642,12 +642,12 @@ async Task WriteHelloAsync(PipeWriter writer)
 - `GetSpan` and `GetMemory` return a buffer with at least the requested amount of memory. Don't assume exact buffer sizes.
 - There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
 - You must request a new buffer after calling `Advance` to continue writing more data; you cannot write to a previously acquired buffer.
-- Calling `Complete` or `CompleteAsync` while there's unflushed data can result in memory corruption.
 - Calling `GetMemory` or `GetSpan` while there's an incomplete call to `FlushAsync` is not safe.
+- Calling `Complete` or `CompleteAsync` while there's unflushed data can result in memory corruption.
 
 ## IDuplexPipe
 
-TBD
+The `IDuplexPipe` is a contract for types that support both reading and writing. For example, a network connection would be represented by an `IDuplexPipe`.
 
 ## Streams
 
