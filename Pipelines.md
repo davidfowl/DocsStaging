@@ -5,6 +5,7 @@
     - [Basic usage](#basic-usage)
     - [Backpressure and flow control](#backpressure-and-flow-control)
     - [PipeScheduler](#pipescheduler)
+    - [Reset](#reset)
 - [PipeReader](#pipereader)
     - [Scenarios](#scenarios)
     - [Cancellation](#cancellation)
@@ -289,6 +290,10 @@ public class SingleThreadPipeScheduler : PipeScheduler
     }
 }
 ```
+
+### Reset
+
+`Pipe` is a large class, as such it may make sense to reuse the object. To make this possible there's a [`Reset`](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipe.reset?view=dotnet-plat-ext-2.1) method that can be used when both the `PipeReader` and `PipeWriter` are complete.
 
 ## [PipeReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipereader?view=dotnet-plat-ext-2.1)
 
