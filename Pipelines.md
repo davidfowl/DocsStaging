@@ -421,7 +421,7 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
 
 ### Cancellation
 
-`PipeReader.ReadAsync` supports passing a `CancellationToken` which will result in an `OperationCanceledException` if the token is cancelled while there's a read pending. It also supports a non-exceptional way to cancel the current read operation via `PipeReader.CancelPendingRead`. Calling this method will return a `ReadResult.IsCanceled` set to true. This can be extremely useful for halting the existing read loop in a non-destructive and non-exceptional way.
+`PipeReader.ReadAsync` supports passing a `CancellationToken` which will result in an `OperationCanceledException` if the token is cancelled while there's a read pending. It also supports a non-exceptional way to cancel the current read operation via `PipeReader.CancelPendingRead`. Calling this method will return a `ReadResult` with `IsCanceled` set to true. This can be extremely useful for halting the existing read loop in a non-destructive and non-exceptional way.
 
 ```C#
 public class MyConnection
@@ -707,6 +707,8 @@ async Task WriteHelloAsync(PipeWriter writer, CanceallationToken cancellationTok
 ```
 
 ### Cancellation
+
+`PipeWriter.FlushAsync` supports passing a `CancellationToken` which will result in an `OperationCanceledException` if the token is cancelled while there's a flush pending. It also supports a non-exceptional way to cancel the current flush operation via `PipeWriter.CancelPendingFlush`. Calling this method will return a `FlushResult` with `IsCanceled` set to true. This can be extremely useful for halting the yielding flush in a non-destructive and non-exceptional way.
 
 ### Gotchas
 
