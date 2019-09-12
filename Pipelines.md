@@ -416,6 +416,69 @@ async Task ProcessMessagesAsync(PipeReader reader, CancellationToken cancellatio
 
 ### Cancellation
 
+`PipeReader.ReadAsync` supports passing a `CancellationToken` which will result in an `OperationCanceledException` if the token is cancelled while there's a read pending. It also supports a non-exceptional way to cancel the current read operation via `PipeReader.CancelPendingRead`. Calling this method will return a `ReadResult.IsCanceled` set to true. This can be extremely useful for halting the existing read loop in a non-destructive and non-exceptional way.
+
+```C#
+public class MyConnection
+{
+    private PipeReader reader;
+    
+    public MyConnection(PipeReader reader)
+    {
+        this.reader = reader;
+    }
+    
+    public void Abort()
+    {
+        // Cancel the pending read so the the process loop ends without an exception
+        reader.CancelPendingRead();
+    }
+    
+    public async Task ProcessMessagesAsync()
+    {
+        try
+        {
+            while (true)
+            {
+                ReadResult result = await reader.ReadAsync();
+                ReadOnlySequence<byte> buffer = result.Buffer;
+
+                try
+                {
+                    if (result.IsCanceled)
+                    {
+                        // The read was cancelled
+                        break;
+                    }
+
+                    // Process all messages from the buffer, modifying the input buffer on each iteration
+                    while (TryParseMessage(ref buffer, out Message message))
+                    {
+                        await ProcessMessageAsync(message);
+                    }
+
+                    // There's no more data to be processed
+                    if (result.IsCompleted)
+                    {
+                        break;
+                    }
+                }
+                finally
+                {
+                    // Since we're processing all messages in the buffer, we can use the remaining buffer's Start and End
+                    // position to determine consumed and examined
+                    reader.AdvanceTo(buffer.Start, buffer.End);
+                }
+            }
+        }
+        finally
+        {
+            await reader.CompleteAsync();
+        }
+    }
+}
+```
+
 ### Gotchas
 
 - Passing the wrong values to consumed/examined may result reading already read data (for e.g. passing a `SequencePosition` that was already processed)
