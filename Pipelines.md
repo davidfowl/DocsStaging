@@ -452,7 +452,7 @@ public class MyConnection
                 {
                     if (result.IsCanceled)
                     {
-                        // The read was cancelled
+                        // The read was canceled, we can quit without reading the existing data
                         break;
                     }
 
