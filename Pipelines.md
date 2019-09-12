@@ -244,7 +244,7 @@ var options = new PipeOptions(pauseWriterThreshold: 10, resumeWriterThreshold: 5
 var pipe = new Pipe(options);
 ```
 
-### PipeScheduler
+### [PipeScheduler](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipescheduler?view=dotnet-plat-ext-2.1)
 
 Usually when using async/await, asynchronous code resumes on either on a `TaskScheduler` or on the current `SynchronizationContext`.
 
