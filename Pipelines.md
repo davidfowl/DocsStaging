@@ -677,7 +677,7 @@ while (true)
 The `PipeWriter` manages buffers for writing on the caller's behalf. `PipeWriter` implements the [`IBufferWriter<byte>`](https://docs.microsoft.com/en-us/dotnet/api/system.buffers.ibufferwriter-1?view=netstandard-2.1) which makes it possible to get access to buffers in order to perform writes without additional buffer copies.
 
 ```C#
-async Task WriteHelloAsync(PipeWriter writer, CanceallationToken cancellationToken = default)
+async Task WriteHelloAsync(PipeWriter writer, CancellationToken cancellationToken = default)
 {
     // Request at least 5 bytes from the PipeWriter
     Span<byte> span = writer.GetSpan(5);
@@ -698,7 +698,7 @@ The preceding method requests a buffer of at least 5 bytes from the `PipeWriter`
 This method of writing will use the buffers provided by the `PipeWriter` but you can also use the [`PipeWriter.WriteAync`](https://docs.microsoft.com/en-us/dotnet/api/system.io.pipelines.pipewriter.writeasync?view=dotnet-plat-ext-3.0)  method to copy an existing buffer to the `PipeWriter`. This will do the work of calling `GetSpan` and `Advance` as appropriate and will also call `PipeWriter.FlushAsync`.
 
 ```C#
-async Task WriteHelloAsync(PipeWriter writer, CanceallationToken cancellationToken = default)
+async Task WriteHelloAsync(PipeWriter writer, CancellationToken cancellationToken = default)
 {
     byte[] helloBytes = Encoding.ASCII.GetBytes("Hello");
     
