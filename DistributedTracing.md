@@ -1,3 +1,12 @@
 - Distributed Tracing Overview
+- Activity
+  - What's an Activity?
+  - Built in support 
+     - ASP.NET Core
+     - HttpClient
+- DiagnosticSource
 - Tools
+  - Application Insights
+  - Jaeger
+  - Zipkin
 - W3C TraceContext
