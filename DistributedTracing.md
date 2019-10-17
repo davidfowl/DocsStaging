@@ -4,6 +4,7 @@
   - Built in support 
      - ASP.NET Core
      - HttpClient
+     - gRPC
 - DiagnosticSource
 - Tools
   - Application Insights
