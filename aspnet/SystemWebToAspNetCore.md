@@ -248,7 +248,7 @@ The above logic is a minimal hello world application using **System.Web**. The *
 
 ## Request processing
 
-`IHttpModule` and `IHttpHandler` are fundamental primitives for hooking into the request processing pipeline in System.Web based applications. Modules run in order and have a fixed set of stages that are applicable to various parts of the request processing pipeline described [here](https://docs.microsoft.com/en-us/previous-versions/aspnet/bb470252(v=vs.100)). Handlers are bound to specific route (more on routing later) or to a specific request path extension.
+`IHttpModule` and `IHttpHandler` are fundamental primitives for hooking into the request processing pipeline in System.Web based applications. Modules run in order and have a fixed set of stages that are applicable to various parts of the request processing pipeline described [here](https://docs.microsoft.com/en-us/previous-versions/aspnet/bb470252(v=vs.100)). Handlers can be chosen on a per request basic by a module. They are usally chosen based on extension or route.
 
 **Hello World Module**
 
