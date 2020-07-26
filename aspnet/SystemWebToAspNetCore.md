@@ -1,6 +1,6 @@
 # Migration from ASP.NET on System.Web to ASP.NET Core
 - [Project Structure](#)
-- [Application Startup](#)
+- [Application Initialization](#)
 - [Request processing](#)
     - [Request Buffering behavior](#)
     - [Response Buffering behavior](#)
@@ -231,7 +231,7 @@ Program.cs has a set of defaults that include:
 
 These defaults can be changed via code and configuration. You can also create a host without these defaults and build your own defaults. This is one of the key tenants of ASP.NET Core. The system is flexible enough and built like buffet so you can build your own system without having to replace everything. 
 
-## Application Startup
+## Application Initialization
 
 The entrypoint to any System.Web based application is Global.asax. Global.asax is an IIS module that runs as part of the integrated pipeline but has a special `Application_Start` event that serves as a place to put your application bootstrapping logic. It's called once per application and runs the very first time a request is made to the application running in IIS.
 
