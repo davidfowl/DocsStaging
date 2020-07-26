@@ -372,6 +372,61 @@ Before we dive into each of the various components of System.Web we should discu
 - Request limits
   - Timeouts
   - Size limits
+  
+#### Request Buffering behavior
+ 
+#### Response Buffering behavior
+Responses are buffered in System.Web based applications by default. That has a few implications:
+- Responses have a Content-Length header
+- Headers can be manipulated until an explicit Flush/FlushAsync is called
+
+**System.Web**
+
+```C#
+public class MyHandler : HttpTaskAsyncHandler
+{
+    public override Task ProcessRequestAsync(HttpContext context)
+    {
+        context.Response.Headers["x"] = "1";
+        context.Response.Write("Hello World");
+        context.Response.Headers["x"] = "2";
+        return Task.CompletedTask;
+    }
+}
+```
+
+Here's an image of the response headers:
+
+![image](https://user-images.githubusercontent.com/95136/88474429-345ea900-cedb-11ea-9d1e-bbc8e03d9cbb.png)
+
+
+```C#
+public class MyHandler : HttpTaskAsyncHandler
+{
+    public override Task ProcessRequestAsync(HttpContext context)
+    {
+        context.Response.Headers["x"] = "1";
+        context.Response.Write("Hello World");
+        context.Response.Flush();
+        context.Response.Headers["x"] = "2";
+        return Task.CompletedTask;
+    }
+}
+```
+
+![image](https://user-images.githubusercontent.com/95136/88474465-77208100-cedb-11ea-9754-7bc379fe3941.png)
+
+The above example chunkes the response body (see the transfer encoding header in the response) instead of setting a content length. The above example throws a server side exception because headers are mutated after the response goes out:
+
+![image](https://user-images.githubusercontent.com/95136/88474495-c5ce1b00-cedb-11ea-9688-f861b5afe68a.png)
+
+**NOTE: This is a first chance exception so it may not show up in the debugger unless you change your settings.**
+
+**ASP.NET Core**
+
+Responses are not buffered by default, this means that writing to the response without explicitly setting a content length can result in an exception:
+
+#### Header manipulation
 
 ### Routing
 
