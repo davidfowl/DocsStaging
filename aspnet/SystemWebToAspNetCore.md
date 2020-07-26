@@ -195,7 +195,7 @@ The above logic is a minimal hello world application using **System.Web**. The *
 
 ## Request processing
 
-`IHttpModule` and `IHttpHandler` are fundamental primitives for hooking into the request processing pipeline in System.Web based applications. Modules run in order and have a fixed set of stages that are applicable to various parts of the Http
+`IHttpModule` and `IHttpHandler` are fundamental primitives for hooking into the request processing pipeline in System.Web based applications. Modules run in order and have a fixed set of stages that are applicable to various parts of the request processing pipeline described [here](https://docs.microsoft.com/en-us/previous-versions/aspnet/bb470252(v=vs.100))
 
 ### Behaviors
 
