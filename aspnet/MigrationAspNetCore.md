@@ -44,7 +44,7 @@ Here's an empty ASP.NET project targeting .NET Framework 4.7.2:
 
 This project has no code files but has lots of functionality built into the system wired up via **web.config** and the `C:\Windows\Microsoft.NET\Framework\v4.0.30319\Config\web.config` (also known as root web.config). ASP.NET on .NET Framework runs on IIS and lots of the functionality is built into Windows and .NET Framework. The root web.config wires up default modules and handles:
 
-## Modules
+### Modules
 
 <details>
   <summary>Click to expand!</summary>
@@ -71,7 +71,7 @@ This project has no code files but has lots of functionality built into the syst
 
 IIS modules are part of the [integrated pipeline](https://docs.microsoft.com/en-us/iis/application-frameworks/building-and-running-aspnet-applications/how-to-take-advantage-of-the-iis-integrated-pipeline) since IIS 7.0.
 
-## Handlers
+### Handlers
 
 <details>
   <summary>Click to expand!</summary>
@@ -172,3 +172,20 @@ The `httpRuntime` section describes the target framework for the ASP.NET applica
 
 The entrypoint to any System.Web based application is Global.asax. Global.asax is an IIS module that runs as part of the integrated pipeline but has a special `Application_Start` event that serves as a place to put your application bootstrapping logic. It's called once per application and runs the very first time a request is made to the application running in IIS.
 
+### Hello World
+
+```C#
+using System;
+
+namespace WebApplication1
+{
+    public class Global : System.Web.HttpApplication
+    {
+        protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+            Context.Response.Write("Hello World");
+            Context.ApplicationInstance.CompleteRequest();
+        }
+    }
+}
+```
