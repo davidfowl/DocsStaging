@@ -1,4 +1,4 @@
-# Migration from ASP.NET to ASP.NET Core
+# Migration from ASP.NET on System.Web to ASP.NET Core
 - [Project Structure](#)
 - [Global.asax](#)
 - [Request processing](#)
