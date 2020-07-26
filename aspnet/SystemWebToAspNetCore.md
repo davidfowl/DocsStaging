@@ -425,7 +425,36 @@ The above example chunkes the response body (see the transfer encoding header in
 
 **ASP.NET Core**
 
-Responses are not buffered by default, this means that writing to the response without explicitly setting a content length can result in an exception:
+The equivalent code in ASP.NET Core looks like this:
+
+```C#
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+
+namespace WebApplication1
+{
+    public class Startup
+    {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            app.Run(async context =>
+            {
+                context.Response.Headers["x"] = "1";
+                await context.Response.WriteAsync("Hello World");
+                context.Response.Headers["x"] = "2";
+            });
+        }
+    }
+}
+
+```
+
+Responses are **NOT** buffered by default, this means that writing to the response without explicitly setting a content length can result in an exception:
+
+![image](https://user-images.githubusercontent.com/95136/88474565-9ff54600-cedc-11ea-8639-c7601971549b.png)
+
 
 #### Header manipulation
 
