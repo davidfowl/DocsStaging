@@ -241,7 +241,40 @@ Register the module by type in web.config under the `system.webServer\modules` s
 </configuration>
 ```
 
-Modules are constructed by the runtime and can't be passed any state in the constructor.
+Modules are constructed by the runtime and can't be passed any state in the constructor. It should also be noted that modules themselves aren't asynchronous but each event handler for the various pipeline stages can be async (albeit with a very old style async API). `IHttpHandler` can be asynchronous and modules can be used to pick the approrate handler:
+
+```C#
+using System.Threading.Tasks;
+using System.Web;
+
+namespace WebApplication1
+{
+    public class MyModule : IHttpModule
+    {
+        public void Init(HttpApplication app)
+        {
+            app.BeginRequest += (sender, e) =>
+            {
+                app.Context.RemapHandler(new MyHandler());
+            };
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    public class MyHandler : HttpTaskAsyncHandler
+    {
+        public override async Task ProcessRequestAsync(HttpContext context)
+        {
+            await Task.Delay(100);
+
+            context.Response.Write("Hello World");
+        }
+    }
+}
+```
 
 ### Behaviors
 
