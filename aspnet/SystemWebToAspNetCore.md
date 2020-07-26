@@ -399,6 +399,7 @@ Here's an image of the response headers:
 
 ![image](https://user-images.githubusercontent.com/95136/88474429-345ea900-cedb-11ea-9d1e-bbc8e03d9cbb.png)
 
+Notice the x header is set to 2 not one. This means headers are allowed to be modified until the response is flushed.
 
 ```C#
 public class MyHandler : HttpTaskAsyncHandler
