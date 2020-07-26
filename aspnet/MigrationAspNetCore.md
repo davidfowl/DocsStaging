@@ -69,6 +69,7 @@ This project has no code files but has lots of functionality built into the syst
 
 <details>
   <summary>Click to expand!</summary>
+  
 ```xml
 <httpHandlers>
     <add path="eurl.axd" verb="*" type="System.Web.HttpNotFoundHandler" validate="True"/>
