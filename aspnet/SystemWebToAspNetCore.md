@@ -470,7 +470,7 @@ namespace WebApplication1
 {
     public class Startup
     {
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.Run(async context =>
             {
@@ -499,7 +499,7 @@ namespace WebApplication1
 {
     public class Startup
     {
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.Run(async context =>
             {
