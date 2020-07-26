@@ -241,6 +241,8 @@ Register the module by type in web.config under the `system.webServer\modules` s
 </configuration>
 ```
 
+Modules are constructed by the runtime and can't be passed any state in the constructor.
+
 ### Behaviors
 
 Before we dive into each of the various components of System.Web we should discuss some of the default behaviors in the system like the infamous "yellow screen of death" (YSOD from here on out).
