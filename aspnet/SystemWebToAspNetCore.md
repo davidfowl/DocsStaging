@@ -246,6 +246,11 @@ namespace WebApplication1
 {
     public class Global : System.Web.HttpApplication
     {
+        protected void Application_Start(object sender, EventArgs e)
+        {
+            // Write initialization logic here
+        }
+        
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
             Context.Response.Write("Hello World");
