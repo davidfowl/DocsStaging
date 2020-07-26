@@ -167,6 +167,59 @@ Every System.Web based application is enabled for runtime page compilation by de
 
 The `httpRuntime` section describes the target framework for the ASP.NET application itself. Since the .NET Framework is updated in place (replaces the older version), we use this flag to control changes in runtime behavior (referred to as quirking) when changes to the defaults are made. For example, if we wanted to change how many headers were added by default, we might decide to toggle this behavior based on the target framework version. This won't affect older applications but it does affect new ones.
 
+### ASP.NET Core
+
+![image](https://user-images.githubusercontent.com/95136/88473099-f9567880-cece-11ea-8cd2-70d6d6a287aa.png)
+
+In ASP.NET Core, there are 3 files by default. `appsettings.json`, `Program.cs` and `Startup.cs`. One of the main differences between System.Web based applications and ASP.NET Core applications is that most of the things that were configuration based were moved to code. In essence, your `Startup.cs` is where most of the application and framework components are wired up.
+
+**Program.cs**
+
+```C#
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+namespace WebApplication56
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+    }
+}
+```
+
+Program.cs has a set of defaults that include:
+- Default logging providers 
+  - Console logging
+  - EventSource logging
+  - EventLog errors (on Windows)
+- Default configuration providers
+  - Envrionment variables
+  - Json configuration (for appsetttings.json)
+- Default Servers
+ - IIS support
+ - Kestrel support
+- Default middleware
+ - Hosting filtering
+
+These defaults can be changed via code and configuration. You can also create a host without these defaults and build your own defaults. This is one of the key tenants of ASP.NET Core. The system is flexible enough and built like buffet so you can build your own system without having to replace everything. 
+
 ## Global.asx
 
 The entrypoint to any System.Web based application is Global.asax. Global.asax is an IIS module that runs as part of the integrated pipeline but has a special `Application_Start` event that serves as a place to put your application bootstrapping logic. It's called once per application and runs the very first time a request is made to the application running in IIS.
