@@ -2,6 +2,7 @@
 - [Project Structure](#)
 - [Global.asax](#)
 - [Modules and Handlers](#)
+- [Configuration](#)
 
 ## System.Web
 **System.Web.dll** is the assembly where ASP.NET on .NET Framework resides. It's core assembly upon which lots of frameworks build on top of (Webforms, MVC, SignalR, etc).
