@@ -358,6 +358,10 @@ namespace WebApplication1
 }
 ```
 
+## ASP.NET Core
+
+The [RequestDelegate](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.requestdelegate?view=aspnetcore-3.1) is the core primitive for request processing in ASP.NET Core. The signaure is an `HttpContext` in with a `Task` returned (if you squint, you'll see it looks alot like `HttpTaskAsyncHandler.ProcessRequestAsync`). ASP.NET Core [Middleware](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.1) is the primitive for chaining request processing components together. 
+
 ### Behaviors and Built-ins
 
 Before we dive into each of the various components of System.Web we should discuss some of the default behaviors in the system:
