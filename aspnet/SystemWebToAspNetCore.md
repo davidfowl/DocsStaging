@@ -423,6 +423,23 @@ The above example chunkes the response body (see the transfer encoding header in
 
 **NOTE: This is a first chance exception so it may not show up in the debugger unless you change your settings.**
 
+Buffering can also be disabled in System.Web based applications by setting HttpResonse.BufferOutput to false.
+
+```C#
+public class MyHandler : HttpTaskAsyncHandler
+{
+    public override Task ProcessRequestAsync(HttpContext context)
+    {
+        context.Response.BufferOutput = true;
+        context.Response.Headers["x"] = "1";
+        context.Response.Write("Hello World");
+        return Task.CompletedTask;
+    }
+}
+```
+
+![image](https://user-images.githubusercontent.com/95136/88487961-c6e46400-cf3e-11ea-91c3-45a3fffe1576.png)
+
 **ASP.NET Core**
 
 The equivalent code in ASP.NET Core looks like this:
