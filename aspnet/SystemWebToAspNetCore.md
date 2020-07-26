@@ -185,7 +185,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace WebApplication56
+namespace WebApplication1
 {
     public class Program
     {
@@ -260,7 +260,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace WebApplication56
+namespace WebApplication1
 {
     public class Startup
     {
