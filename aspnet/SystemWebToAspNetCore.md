@@ -363,7 +363,7 @@ namespace WebApplication1
 }
 ```
 
-## ASP.NET Core
+**ASP.NET Core**
 
 The [RequestDelegate](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.requestdelegate?view=aspnetcore-3.1) is the core primitive for request processing in ASP.NET Core. The signaure is an `HttpContext` in with a `Task` returned (if you squint, you'll see it looks alot like `HttpTaskAsyncHandler.ProcessRequestAsync`). ASP.NET Core [Middleware](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-3.1) is the primitive for chaining request processing components together. 
 
@@ -378,9 +378,9 @@ Before we dive into each of the various components of System.Web we should discu
   - Timeouts
   - Size limits
   
-#### Request Buffering behavior
+### Request Buffering behavior
  
-#### Response Buffering behavior
+### Response Buffering behavior
 Responses are buffered in System.Web based applications by default. That has a few implications:
 - Responses have a Content-Length header
 - Headers can be manipulated until an explicit Flush/FlushAsync is called
@@ -470,16 +470,39 @@ namespace WebApplication1
         }
     }
 }
-
 ```
 
 Responses are **NOT** buffered by default, this means that writing to the response without explicitly setting a content length can result in an exception:
 
 ![image](https://user-images.githubusercontent.com/95136/88474565-9ff54600-cedc-11ea-8639-c7601971549b.png)
 
+In order to generate `Content-Length` based responses, the `ContentLength` property needs to be set explicitly before the response is written:
 
-#### Header manipulation
+```C#
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 
-### Routing
+namespace WebApplication1
+{
+    public class Startup
+    {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            app.Run(async context =>
+            {
+                context.Response.Headers["x"] = "1";
+                context.Response.ContentLength = 11;
+                await context.Response.WriteAsync("Hello World");
+            });
+        }
+    }
+}
+```
+
+### Header manipulation
+
+## Routing
 
 TBD
