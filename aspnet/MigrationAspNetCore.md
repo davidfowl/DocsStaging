@@ -1,5 +1,7 @@
 # Migration from ASP.NET to ASP.NET Core
-- [Project Structure]()
+- [Project Structure](#)
+- [Global.asax](#)
+- [Modules and Handlers](#)
 
 ## System.Web
 **System.Web.dll** is the assembly where ASP.NET on .NET Framework resides. It's core assembly upon which lots of frameworks build on top of (Webforms, MVC, SignalR, etc).
@@ -166,4 +168,5 @@ The `httpRuntime` section describes the target framework for the ASP.NET applica
 
 ## Global.asx
 
-The entrypoint to any System.Web based application is Global.asax. 
+The entrypoint to any System.Web based application is Global.asax. Global.asax is an IIS module that runs as part of the integrated pipeline but has a special `Application_Start` event that serves as a place to put your application bootstrapping logic. It's called once per application and runs the very first time a request is made to the application running in IIS.
+
