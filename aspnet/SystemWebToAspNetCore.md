@@ -263,13 +263,8 @@ namespace WebApplication56
 {
     public class Startup
     {
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app.Run(async context =>
             {
                 await context.Response.WriteAsync("Hello World!");
