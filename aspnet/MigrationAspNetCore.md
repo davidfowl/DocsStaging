@@ -126,4 +126,4 @@ This project has no code files but has lots of functionality built into the syst
 </httpHandlers>
 ```
 
-This is why the web.config in your application is so small. By default System.Web based projects
+This is why the web.config in your application is so small. By default System.Web based projects inherit the configuration hierarchy from both your project local configuration, other the system wide configuration files that include a massive set of behavior.
