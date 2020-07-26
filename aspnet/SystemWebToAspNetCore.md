@@ -276,9 +276,14 @@ namespace WebApplication1
 }
 ```
 
-### Behaviors
+### Behaviors and Built-ins
 
-Before we dive into each of the various components of System.Web we should discuss some of the default behaviors in the system like the infamous "yellow screen of death" (YSOD from here on out).
+Before we dive into each of the various components of System.Web we should discuss some of the default behaviors in the system:
+- Request timeouts
+- Request Buffering behavior
+- Response Buffering behavior
+- Error handling behavior
+- Header manipulation
 
 ### Routing
 
