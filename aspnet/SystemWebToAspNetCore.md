@@ -195,8 +195,56 @@ The above logic is a minimal hello world application using **System.Web**. The *
 
 ## Request processing
 
-`IHttpModule` and `IHttpHandler` are fundamental primitives for hooking into the request processing pipeline in System.Web based applications. Modules run in order and have a fixed set of stages that are applicable to various parts of the request processing pipeline described [here](https://docs.microsoft.com/en-us/previous-versions/aspnet/bb470252(v=vs.100))
+`IHttpModule` and `IHttpHandler` are fundamental primitives for hooking into the request processing pipeline in System.Web based applications. Modules run in order and have a fixed set of stages that are applicable to various parts of the request processing pipeline described [here](https://docs.microsoft.com/en-us/previous-versions/aspnet/bb470252(v=vs.100)). Handlers are bound to specific route (more on routing later) or to a specific request path extension.
+
+**Hello World Module**
+
+**MyModule.cs**
+
+```C#
+using System.Web;
+
+namespace WebApplication1
+{
+    public class MyModule : IHttpModule
+    {
+        public void Init(HttpApplication app)
+        {
+            app.BeginRequest += (sender, e) =>
+            {
+                app.Context.Response.Write("Hello World");
+                app.CompleteRequest();
+            };
+        }
+        
+        public void Dispose()
+        {
+        }
+    }
+}
+```
+
+Register the module by type in web.config under the `system.webServer\modules` section.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <system.web>
+    <compilation debug="true" targetFramework="4.7.2"/>
+    <httpRuntime targetFramework="4.7.2"/>
+  </system.web>
+  <system.webServer>
+    <modules>
+      <add name="mymodule" type="WebApplication1.MyModule, WebApplication1" />
+    </modules>
+  </system.webServer>
+</configuration>
+```
 
 ### Behaviors
 
 Before we dive into each of the various components of System.Web we should discuss some of the default behaviors in the system like the infamous "yellow screen of death" (YSOD from here on out).
+
+### Routing
+
+TBD
