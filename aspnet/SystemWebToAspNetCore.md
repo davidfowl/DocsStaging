@@ -365,11 +365,13 @@ The [RequestDelegate](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspn
 ### Behaviors and Built-ins
 
 Before we dive into each of the various components of System.Web we should discuss some of the default behaviors in the system:
-- Request timeouts
 - Request Buffering behavior
 - Response Buffering behavior
 - Error handling behavior
 - Header manipulation
+- Request limits
+  - Timeouts
+  - Size limits
 
 ### Routing
 
