@@ -1,6 +1,6 @@
 # Migration from ASP.NET on System.Web to ASP.NET Core
 - [Project Structure](#)
-- [Global.asax](#)
+- [Application Startup](#)
 - [Request processing](#)
     - [Request Buffering behavior](#)
     - [Response Buffering behavior](#)
