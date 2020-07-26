@@ -1,8 +1,8 @@
 # Migration from ASP.NET to ASP.NET Core
 - [Project Structure](#)
 - [Global.asax](#)
-- [Behaviors](#)
 - [Modules and Handlers](#)
+- [Behaviors](#)
 - [HttpContext](#)
 - [Configuration](#)
 
@@ -194,3 +194,11 @@ namespace WebApplication1
 ```
 
 The above logic is a minimal hello world application using **System.Web**. The **Global.asax** file hooks the BeginRequest event (which is detected by naming convention `Application_{eventname}` with the event method signature) and writes the string "Hello World" to the response. Context in this case is an `HttpContext`, one of the central types when interacting with the ASP.NET request pipeline (more on this later). The second line of code calls `CompleteRequest` on the `ApplicationInstance`, this is important because it short circuits the IIS pipeline from executing and will make sure no other modules run and change the outcome of this application. This is one of the fundamental behaviors of the System.Web and IIS programming model. There's a pipeline of modules that run in order and a series of events for each of those modules.
+
+### Modules and Handlers
+
+`IHttpModule` and `IHttpHandler` are fundamental primitives for hooking into the request processing pipeline
+
+## Behaviors
+
+Before we dive into each of the various components of System.Web we should discuss some of the default behaviors in the system like the infamous "yellow screen of death" (YSOD from here on out).
