@@ -244,13 +244,14 @@ namespace WebApplication1
 }
 ```
 
-The above logic is a minimal hello world application using **System.Web**. The **Global.asax** file hooks the BeginRequest event (which is detected by naming convention `Application_{eventname}` with the event method signature) and writes the string "Hello World" to the response. Context in this case is an `HttpContext`, one of the central types when interacting with the ASP.NET request pipeline (more on this later). The second line of code calls `CompleteRequest` on the `ApplicationInstance`, this is important because it short circuits the IIS pipeline from executing and will make sure no other modules run and change the outcome of this application. This is one of the fundamental behaviors of the System.Web and IIS programming model. There's a pipeline of modules that run in order and a series of events for each of those modules.
+The above logic is a minimal hello world application using **System.Web**. The **Global.asax** file hooks the BeginRequest event (which is detected by naming convention `Application_{eventname}` with the event method signature) and writes the string "Hello World" to the response (learn more about these events in the (Request Processing)[#] section of this document). Context in this case is an `HttpContext`, one of the central types when interacting with the ASP.NET request pipeline (more on this later). The second line of code calls `CompleteRequest` on the `ApplicationInstance`, this is important because it short circuits the IIS pipeline from executing and will make sure no other modules run and change the outcome of this application. This is one of the fundamental behaviors of the System.Web and IIS programming model. There's a pipeline of modules that run in order and a series of events for each of those modules.
 
 ### ASP.NET Core
 
 In ASP.NET Core applications, the entry point has a Main. This is important because one of the guiding principles of ASP.NET Core is to act like a normal console application with a different entrypoint. In System.Web based applications, the application bootstrapping is handled by the framework and you get to write code in a different, framework specific entrypoint. This makes your application less portable and tied to this hosting model. ASP.NET Core moves your application entry point to be a normal .NET application entry point with a Main.
 
-**Startup.cs** is where you wire up your application dependencies and configure the request processing pipeline. 
+**Startup.cs** is where you wire up your application dependencies and configure the request processing pipeline. Here's a simple hello world application.
+
 
 ```C#
 using Microsoft.AspNetCore.Builder;
