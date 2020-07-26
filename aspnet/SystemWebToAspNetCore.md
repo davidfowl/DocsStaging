@@ -206,17 +206,17 @@ namespace WebApplication56
 
 Program.cs has a set of defaults that include:
 - Default logging providers 
-  - Console logging
-  - EventSource logging
-  - EventLog errors (on Windows)
+    - Console logging
+    - EventSource logging
+    - EventLog errors (on Windows)
 - Default configuration providers
-  - Envrionment variables
-  - Json configuration (for appsetttings.json)
+    - Envrionment variables
+    - Json configuration (for appsetttings.json)
 - Default Servers
- - IIS support
- - Kestrel support
+    - IIS support
+    - Kestrel support
 - Default middleware
- - Hosting filtering
+    - Hosting filtering
 
 These defaults can be changed via code and configuration. You can also create a host without these defaults and build your own defaults. This is one of the key tenants of ASP.NET Core. The system is flexible enough and built like buffet so you can build your own system without having to replace everything. 
 
