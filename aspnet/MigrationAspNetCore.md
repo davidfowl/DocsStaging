@@ -42,6 +42,9 @@ This project has no code files but has lots of functionality built into the syst
 
 ## Modules
 
+<details>
+  <summary>Click to expand!</summary>
+
 ```xml
 <httpModules>
     <add name="OutputCache" type="System.Web.Caching.OutputCacheModule"/>
@@ -60,11 +63,13 @@ This project has no code files but has lots of functionality built into the syst
     <add name="ScriptModule-4.0" type="System.Web.Handlers.ScriptModule, System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"/>
 </httpModules>
 ```
+</details>
+
 ## Handlers
 
+<details>
+  <summary>Click to expand!</summary>
 ```xml
-
-
 <httpHandlers>
     <add path="eurl.axd" verb="*" type="System.Web.HttpNotFoundHandler" validate="True"/>
     <add path="trace.axd" verb="*" type="System.Web.Handlers.TraceHandler" validate="True"/>
@@ -125,6 +130,8 @@ This project has no code files but has lots of functionality built into the syst
     <add path="*" verb="*" type="System.Web.HttpMethodNotAllowedHandler" validate="True"/>
 </httpHandlers>
 ```
+
+</details>
 
 This is why the web.config in your application is so small. By default System.Web based projects inherit the configuration hierarchy from both your project local configuration, other the system wide configuration files that include a massive set of behavior. This is what makes it possible to install ASP.NET, point IIS at a folder with a single aspx file and have it just work without further configuration.
 
