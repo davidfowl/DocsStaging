@@ -1,6 +1,7 @@
 # Migration from ASP.NET to ASP.NET Core
 - [Project Structure](#)
 - [Global.asax](#)
+- [Behaviors](#)
 - [Modules and Handlers](#)
 - [HttpContext](#)
 - [Configuration](#)
