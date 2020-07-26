@@ -4,6 +4,7 @@
 - [Request processing](#)
 - [Modules](#)
     - [Authentication](#)
+    - [Routing](#)
     - [Session](#)
     - [OutputCaching](#)
     - [StaticFiles](#)
