@@ -52,11 +52,11 @@ Here's an empty ASP.NET project targeting .NET Framework 4.7.2:
 </configuration>
 ```
 
-This project has no code files but has lots of functionality built into the system wired up via **web.config** and the `C:\Windows\Microsoft.NET\Framework\v4.0.30319\Config\web.config` (also known as root web.config). ASP.NET on .NET Framework runs on IIS and lots of the functionality is built into Windows and .NET Framework. The root web.config wires up default modules and handles:
-
 Every System.Web based application is enabled for runtime page compilation by default (for webforms and razor files as an example). This is a subsystem in ASP.NET called the BuildManager and it's a very pluggable and flexiable system. The default templates configure the compilation for debug (so debugging information is emitting during compile time) and specify the target framework of the compiled pages. 
 
 The `httpRuntime` section describes the target framework for the ASP.NET application itself. Since the .NET Framework is updated in place (replaces the older version), we use this flag to control changes in runtime behavior (referred to as quirking) when changes to the defaults are made. For example, if we wanted to change how many headers were added by default, we might decide to toggle this behavior based on the target framework version. This won't affect older applications but it does affect new ones.
+
+This project has no code files but has lots of functionality built into the system wired up via **web.config** and the `C:\Windows\Microsoft.NET\Framework\v4.0.30319\Config\web.config` (also known as root web.config). ASP.NET on .NET Framework runs on IIS and lots of the functionality is built into Windows and .NET Framework. The root web.config wires up default modules and handlers:
 
 ### Modules
 
