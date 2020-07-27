@@ -59,7 +59,7 @@ The `httpRuntime` section describes the target framework for the ASP.NET applica
 
 This project has no code files but has lots of functionality built into the system wired up via **web.config** and the `C:\Windows\Microsoft.NET\Framework\v4.0.30319\Config\web.config` (also known as root web.config). ASP.NET on .NET Framework runs on IIS and lots of the functionality is built into Windows and .NET Framework. The root web.config wires up default modules and handlers:
 
-### Modules
+### Built-in Modules
 
 <details>
   <summary>Click to expand!</summary>
@@ -86,7 +86,7 @@ This project has no code files but has lots of functionality built into the syst
 
 IIS modules are part of the [integrated pipeline](https://docs.microsoft.com/en-us/iis/application-frameworks/building-and-running-aspnet-applications/how-to-take-advantage-of-the-iis-integrated-pipeline) since IIS 7.0.
 
-### Handlers
+### Built-in Handlers
 
 <details>
   <summary>Click to expand!</summary>
