@@ -391,7 +391,19 @@ public class MyHandler : HttpTaskAsyncHandler
 
 Here's an image of the response headers:
 
-![image](https://user-images.githubusercontent.com/95136/88474429-345ea900-cedb-11ea-9d1e-bbc8e03d9cbb.png)
+| **Key**  | **Value**   |
+|---|---|
+| Cache-Control  | private  |
+| Content-Type  | text/html;charset=utf-8 |
+| Content-Encoding  | gzip  |
+| Vary  | Accept-Encoding  |
+| Server  | Microsoft-IIS/10.0  |
+| x  | 2  |
+| X-AspNet-Version  | 4.0.30319 |
+| X-SourceFiles  | =?UTF-8?B?QzpcVXNlcnNcZGF2aWZvd2xcc291... |
+| X-Powered-By  |  ASP.NET |
+| Date  | Mon, 27 Jul 2020 01:45:55 GMT |
+| Content-Length  | 129 |
 
 Notice the x header is set to 2 not one. This means headers are allowed to be modified until the response is flushed.
 
