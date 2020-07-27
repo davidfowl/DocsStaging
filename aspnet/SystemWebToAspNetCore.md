@@ -481,7 +481,7 @@ These are the response headers in this case.
 | Date  | Mon, 27 Jul 2020 01:45:55 GMT |
 
 
-The above example chunkes the response body (see the transfer encoding header in the response) instead of setting a content length. The above example throws a server side exception because headers are mutated after the response goes out:
+The above example chunkes the response body (see the transfer encoding header in the response) instead of setting a content length. The example also throws a server side exception because headers are mutated after the response goes out:
 
 ![image](https://user-images.githubusercontent.com/95136/88474495-c5ce1b00-cedb-11ea-9688-f861b5afe68a.png)
 
@@ -502,7 +502,21 @@ public class MyHandler : HttpTaskAsyncHandler
 }
 ```
 
-![image](https://user-images.githubusercontent.com/95136/88487961-c6e46400-cf3e-11ea-91c3-45a3fffe1576.png)
+| **Key**  | **Value**   |
+|---|---|
+| Cache-Control  | private  |
+| Transfer-Encoding  | chunked |
+| Content-Type  | text/html;charset=utf-8 |
+| Content-Encoding  | gzip  |
+| Vary  | Accept-Encoding  |
+| Server  | Microsoft-IIS/10.0  |
+| x  | 1  |
+| X-AspNet-Version  | 4.0.30319 |
+| X-SourceFiles  | =?UTF-8?B?QzpcVXNlcnNcZGF2aWZvd2xcc291... |
+| X-Powered-By  |  ASP.NET |
+| Date  | Mon, 27 Jul 2020 01:45:55 GMT |
+
+The response is the same as an explicit call to Flush.
 
 **ASP.NET Core**
 
