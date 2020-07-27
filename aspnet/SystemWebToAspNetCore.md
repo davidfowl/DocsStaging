@@ -389,7 +389,7 @@ public class MyHandler : HttpTaskAsyncHandler
 }
 ```
 
-Here's an image of the response headers:
+Here's are the response headers:
 
 | **Key**  | **Value**   |
 |---|---|
@@ -421,7 +421,20 @@ public class MyHandler : HttpTaskAsyncHandler
 }
 ```
 
-![image](https://user-images.githubusercontent.com/95136/88474465-77208100-cedb-11ea-9754-7bc379fe3941.png)
+| **Key**  | **Value**   |
+|---|---|
+| Cache-Control  | private  |
+| Transfer-Encoding  | chunked |
+| Content-Type  | text/html;charset=utf-8 |
+| Content-Encoding  | gzip  |
+| Vary  | Accept-Encoding  |
+| Server  | Microsoft-IIS/10.0  |
+| x  | 1  |
+| X-AspNet-Version  | 4.0.30319 |
+| X-SourceFiles  | =?UTF-8?B?QzpcVXNlcnNcZGF2aWZvd2xcc291... |
+| X-Powered-By  |  ASP.NET |
+| Date  | Mon, 27 Jul 2020 01:45:55 GMT |
+
 
 The above example chunkes the response body (see the transfer encoding header in the response) instead of setting a content length. The above example throws a server side exception because headers are mutated after the response goes out:
 
