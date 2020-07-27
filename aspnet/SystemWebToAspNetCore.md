@@ -62,7 +62,6 @@ This project has no code files but has lots of functionality built into the syst
 ### Built-in Modules
 
 <details>
-  <summary>Click to expand!</summary>
 
 ```xml
 <httpModules>
@@ -89,8 +88,7 @@ IIS modules are part of the [integrated pipeline](https://docs.microsoft.com/en-
 ### Built-in Handlers
 
 <details>
-  <summary>Click to expand!</summary>
-  
+
 ```xml
 <httpHandlers>
     <add path="eurl.axd" verb="*" type="System.Web.HttpNotFoundHandler" validate="True"/>
