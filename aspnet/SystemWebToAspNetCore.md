@@ -421,6 +421,8 @@ public class MyHandler : HttpTaskAsyncHandler
 }
 ```
 
+These are the response headers in this case.
+
 | **Key**  | **Value**   |
 |---|---|
 | Cache-Control  | private  |
