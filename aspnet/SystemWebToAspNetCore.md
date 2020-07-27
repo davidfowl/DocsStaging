@@ -413,7 +413,7 @@ Writing the same "Hello World" response in ASP.NET Core has the following conten
 ### Request Buffering behavior
 There are several ways in System.Web based applications to read the raw body:
 - [`HttpRequest.InputStream`](https://docs.microsoft.com/en-us/dotnet/api/system.web.httprequest.inputstream?view=netframework-4.8)
-- [`HttpRequest.GetBufferlessInputStream ()`](https://docs.microsoft.com/en-us/dotnet/api/system.web.httprequest.getbufferlessinputstream?view=netframework-4.8)
+- [`HttpRequest.GetBufferlessInputStream()`](https://docs.microsoft.com/en-us/dotnet/api/system.web.httprequest.getbufferlessinputstream?view=netframework-4.8)
 - [`HttpRequest.GetBufferedInputStream()`](https://docs.microsoft.com/en-us/dotnet/api/system.web.httprequest.getbufferedinputstream?view=netframework-4.8)
 
 ### Response Buffering behavior
