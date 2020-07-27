@@ -2,6 +2,7 @@
 - [Project Structure](#)
 - [Application Initialization](#)
 - [Request processing](#)
+    - [Default Response Headers](#)
     - [Request Buffering behavior](#)
     - [Response Buffering behavior](#)
     - [Error handling behavior](#)
@@ -359,6 +360,7 @@ The [RequestDelegate](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspn
 ### Behaviors and Built-ins
 
 Before we dive into each of the various components of System.Web we should discuss some of the default behaviors in the system:
+- Default Response Headers
 - Request Buffering behavior
 - Response Buffering behavior
 - Error handling behavior
@@ -366,7 +368,48 @@ Before we dive into each of the various components of System.Web we should discu
 - Request limits
   - Timeouts
   - Size limits
-  
+
+### Default Response Headers
+
+**System.Web**
+
+System.Web based application assume the browser is the client. Here's the default set of response headers:
+
+Here's are the response headers:
+
+| **Key**  | **Value**   |
+|---|---|
+| Cache-Control  | private  |
+| Content-Type  | text/html;charset=utf-8 |
+| Content-Encoding  | gzip  |
+| Vary  | Accept-Encoding  |
+| Server  | Microsoft-IIS/10.0  |
+| X-AspNet-Version  | 4.0.30319 |
+| X-SourceFiles  | =?UTF-8?B?QzpcVXNlcnNcZGF2aWZvd2xcc291... |
+| X-Powered-By  |  ASP.NET |
+| Date  | Mon, 27 Jul 2020 01:45:55 GMT |
+| Content-Length  | 129 |
+
+- The default Content-Type is text/html
+- There are default Cache-Control headers
+- There's an X-SourceFiles header generated for localhost requests only
+
+**ASP.NET Core**
+
+Writing the same "Hello World" response in ASP.NET Core has the following content:
+
+**Kestrel**
+
+| **Key**  | **Value**   |
+|---|---|
+| Date  | Mon, 27 Jul 2020 02:30:50 GMT  |
+| Transfer-Encoding  | chunked |
+| Server  | Kestrel  |
+
+- There's no assumption on Content-Type
+- There are no Cache-Control headers
+- The response is chunked by default (more on the response buffering behaviro in a section below)
+
 ### Request Buffering behavior
  
 ### Response Buffering behavior
