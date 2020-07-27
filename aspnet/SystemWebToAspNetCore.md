@@ -416,6 +416,13 @@ There are several ways in System.Web based applications to read the raw body:
 - [`HttpRequest.GetBufferlessInputStream()`](https://docs.microsoft.com/en-us/dotnet/api/system.web.httprequest.getbufferlessinputstream?view=netframework-4.8)
 - [`HttpRequest.GetBufferedInputStream()`](https://docs.microsoft.com/en-us/dotnet/api/system.web.httprequest.getbufferedinputstream?view=netframework-4.8)
 
+There are various ways to read the input stream, each with their documented caveats.
+
+#### Reading Forms
+
+
+#### File Uploads
+
 ### Writing Response bodies
 Responses are buffered in System.Web based applications by default. That has a few implications:
 - Responses have a Content-Length header
