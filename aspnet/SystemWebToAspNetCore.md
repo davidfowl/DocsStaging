@@ -3,8 +3,8 @@
 - [Application Initialization](#)
 - [Request processing](#)
     - [Default Response Headers](#)
-    - [Request Buffering behavior](#)
-    - [Response Buffering behavior](#)
+    - [Reading Request bodies](#)
+    - [Writing Response bodies](#)
     - [Error handling behavior](#)
     - [Header manipulation](#)
     - [Request limits](#)
@@ -410,13 +410,13 @@ Writing the same "Hello World" response in ASP.NET Core has the following conten
 - There are no Cache-Control headers
 - The response is chunked by default (more on the response buffering behaviro in a section below)
 
-### Request Buffering behavior
+### Reading Request bodies
 There are several ways in System.Web based applications to read the raw body:
 - [`HttpRequest.InputStream`](https://docs.microsoft.com/en-us/dotnet/api/system.web.httprequest.inputstream?view=netframework-4.8)
 - [`HttpRequest.GetBufferlessInputStream()`](https://docs.microsoft.com/en-us/dotnet/api/system.web.httprequest.getbufferlessinputstream?view=netframework-4.8)
 - [`HttpRequest.GetBufferedInputStream()`](https://docs.microsoft.com/en-us/dotnet/api/system.web.httprequest.getbufferedinputstream?view=netframework-4.8)
 
-### Response Buffering behavior
+### Writing Response bodies
 Responses are buffered in System.Web based applications by default. That has a few implications:
 - Responses have a Content-Length header
 - Headers can be manipulated until an explicit Flush/FlushAsync is called
