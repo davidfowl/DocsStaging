@@ -418,7 +418,6 @@ There are various ways to read the input stream, each with their documented cave
 
 #### Reading Forms
 
-
 #### File Uploads
 
 ### Writing Response bodies
@@ -584,6 +583,13 @@ namespace WebApplication1
 ```
 
 ### Header manipulation
+
+### Request limits
+
+```C#
+internal const int DefaultMaxRequestLength = 4096 * 1024;  // 4MB
+internal const int DefaultRequestLengthDiskThreshold = 80 * 1024; // 80KB
+```
 
 ## Routing
 
