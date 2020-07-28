@@ -6,7 +6,7 @@
     - [Reading Request bodies](#)
     - [Writing Response bodies](#)
     - [Error handling behavior](#)
-    - [Header manipulation](#)
+    - [Header and Querystring manipulation](#)
     - [Request limits](#)
 - [Modules](#)
     - [Authentication](#)
@@ -582,7 +582,7 @@ namespace WebApplication1
 }
 ```
 
-### Header manipulation
+### Header and QueryString manipulation
 
 ### Request limits
 
