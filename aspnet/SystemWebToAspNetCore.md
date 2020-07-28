@@ -584,6 +584,20 @@ namespace WebApplication1
 
 ### Header and QueryString manipulation
 
+In System.Web based applications, headers and query strings are represented as [NameValueCollection](https://docs.microsoft.com/en-us/dotnet/api/system.collections.specialized.namevaluecollection?view=netcore-3.1). This is a keyed collection where the value may be a `string` or `string[]`. In ASP.NET Core the query string is represented as an [IQueryCollection](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.iquerycollection?view=aspnetcore-3.1) and headers are represented as [IHeaderDictionary](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.iheaderdictionary?view=aspnetcore-3.1). These 2 collections are also keyed collections where the values is a [StringValues](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.primitives.stringvalues?view=dotnet-plat-ext-3.1) struct. [StringValues](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.primitives.stringvalues?view=dotnet-plat-ext-3.1) is a stuct that represents a `string` or `string[]` and has implicit converstions as well as other useful operations for working with them.
+
+#### Reading
+
+#### Writing
+
+**Operation**| **System.Web**  | **ASP.NET Core**   | **Notes**
+|---|---|---|---|
+|Add | `context.Response.AddHeader("X-MyHeader", "1");` OR `context.Response.Headers.Add("X-MyHeader", "1");` | `context.Response.Headers.Add("X-MyHeader", "1");` | |
+|Add Multiple | same as Add | `context.Response.Headers.Append("X-MyHeader", "1"); context.Response.Headers.Append("X-MyHeader", "2");` OR `context.Response.Headers.Add("X-MyHeader", new[] { "1", "2" });` | |
+|Replace | `context.Response.Headers["X-MyHeader"] = "1";` OR  `context.Response.Headers.Set("X-MyHeader", "1");` | `context.Response.Headers["X-MyHeader"] = "1";` |
+|Delete | `context.Response.Headers.Remove("X-MyHeader");`| `context.Response.Headers.Remove("X-MyHeader");` |
+
+
 ### Request limits
 
 ```C#
