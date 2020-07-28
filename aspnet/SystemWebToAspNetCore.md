@@ -594,6 +594,7 @@ In System.Web based applications, headers and query strings are represented as [
 |---|---|---|
 |Add | `context.Response.AddHeader("X-MyHeader", "1");` OR `context.Response.Headers.Add("X-MyHeader", "1");` | `context.Response.Headers.Add("X-MyHeader", "1");` |
 |Add Multiple | same as Add | `context.Response.Headers.Append("X-MyHeader", "1"); context.Response.Headers.Append("X-MyHeader", "2");` OR `context.Response.Headers.Add("X-MyHeader", new[] { "1", "2" });` |
+|Add comma-separated | Not built-in | `context.Response.Headers.AppendCommaSeparatedValues("X-MyHeader", "1", "2");` |
 |Replace | `context.Response.Headers["X-MyHeader"] = "1";` OR  `context.Response.Headers.Set("X-MyHeader", "1");` | `context.Response.Headers["X-MyHeader"] = "1";` |
 |Delete | `context.Response.Headers.Remove("X-MyHeader");`| `context.Response.Headers.Remove("X-MyHeader");` |
 
