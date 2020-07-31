@@ -19,6 +19,7 @@ Using DI in:
 * Models
 * Views
 * Controllers
+* 3rd party DI
 
 ## Model binding and validation
 
